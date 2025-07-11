@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
 	const theme = useTheme();
 	const customTheme = extendTheme({
-		fontFamily: { body: "var(--font-comfortaa)" },
+		fontFamily: { body: "var(--font-noto-sans)" },
 		colorSchemes: {
 			dark: {
 				palette: {
@@ -17,7 +17,10 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 			},
 			light: {
 				palette: {
-					background: { body: theme.palette.primary[200], surface: theme.palette.neutral[100] },
+					background: {
+						body: theme.palette.neutral[100],
+						surface: theme.palette.neutral[200],
+					},
 				},
 			},
 		},
@@ -26,6 +29,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 				styleOverrides: {
 					root: {
 						transition: "background-color 250ms ease, color 250ms ease",
+						fontFamily: "var(--font-ginto-discord)",
 					},
 				},
 			},

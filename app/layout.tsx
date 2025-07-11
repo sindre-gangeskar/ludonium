@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Comfortaa, Geist, Geist_Mono } from "next/font/google";
+import { Comfortaa, Geist, Geist_Mono, Noto_Sans } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/theme/ThemeProvider";
 import { Container } from "@mui/joy";
@@ -21,6 +21,12 @@ const comfortaa = Comfortaa({
 	subsets: ["latin"],
 });
 
+const notoSans = Noto_Sans({
+	variable: '--font-noto-sans',
+	subsets: ['latin']
+})
+
+
 export const metadata: Metadata = {
 	title: "Project Giveaway",
 	description: "Giveaway application that gives away donated game keys",
@@ -33,11 +39,11 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} antialiased`}>
+			<body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} ${notoSans.variable} antialiased`}>
 				<SessionProvider>
 					<ThemeProvider>
 						<Navbar />
-						<Container maxWidth={'xl'}>{children}</Container>
+						<Container maxWidth={"xl"}>{children}</Container>
 					</ThemeProvider>
 				</SessionProvider>
 			</body>

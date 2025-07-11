@@ -1,11 +1,12 @@
 import NextAuth from "next-auth";
 import Discord from "next-auth/providers/discord";
-
+import { GuildProps } from "./lib/definitions";
 declare module "next-auth" {
 	interface Session {
-		guilds?: unknown;
-		guild: { id: string; name: string };
-		discordServer: string;
+		isMemberOfGuild: boolean;
+		name: string;
+		icon: string;
+		guild: { id: string; name: string; icon?: string };
 	}
 }
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -22,11 +23,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
 		async session({ session, token }) {
 			const data = await fetch("https://discord.com/api/users/@me/guilds", { headers: { Authorization: `Bearer ${token.access_token}` } });
-			session.guilds = await data.json();
-
-			if (Array.isArray(session.guilds)) {
-				session.guilds = session.guilds.map(guild => ({ name: guild.name, id: guild.id }));
-				session.guild = (session.guilds as Array<{ name: string; id: string }>).find(guild => guild.id === process.env.DISCORD_SERVER_ID) ?? { id: "", name: "" };
+			
+			const guilds = await data.json();
+			if (Array.isArray(guilds)) {
+				session.isMemberOfGuild = guilds.some((guild: GuildProps) => guild.id === process.env.DISCORD_SERVER_ID);
 			}
 			return session;
 		},
