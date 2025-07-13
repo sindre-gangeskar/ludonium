@@ -11,7 +11,7 @@ export default function Navbar() {
 	const locations: { name: string; href: string }[] = [
 		{ name: "Home", href: "/" },
 		{ name: "Discord Community", href: "/community" },
-		{ name: "Donate", href: "/donate" },
+		...(status === "authenticated" ? [{ name: "Donate", href: "/donate" }] : []),
 	];
 
 	const avatarSx: SxProps = { width: 50, height: 50 };

@@ -18,8 +18,8 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 			light: {
 				palette: {
 					background: {
-						body: theme.palette.neutral[100],
-						surface: theme.palette.neutral[200],
+						body: theme.palette.neutral[200],
+						surface: theme.palette.neutral[100],
 					},
 				},
 			},

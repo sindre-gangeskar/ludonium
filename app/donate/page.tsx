@@ -1,5 +1,11 @@
-import { Typography } from "@mui/joy";
+import Form from "@/components/donate/Form";
+import FormSkeleton from "@/components/donate/FormSkeleton";
+import { Suspense } from "react";
 
 export default function Page() {
-  return <Typography>Donate Page</Typography>
+	return (
+		<Suspense fallback={<FormSkeleton />}>
+			<Form />
+		</Suspense>
+	);
 }

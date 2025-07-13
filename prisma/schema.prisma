@@ -15,17 +15,38 @@ datasource db {
 }
 
 model Key {
-  id  Int    @id @default(autoincrement())
-  key String @unique
-  discordId String
+  id       Int       @id @default(autoincrement())
+  key      String    @unique
+  donation Donation?
 
-  @@unique([key, discordId])
   @@map("keys")
 }
 
+model Donation {
+  id         Int       @id @default(autoincrement())
+  keyId      Int       @unique
+  key        Key?      @relation(fields: [keyId], references: [id])
+  discordId Int
+  platformId Int
+  platform   Platform? @relation(fields: [platformId], references: [id])
+
+  @@map("donations")
+}
+
 model Platform {
-  id Int @id @default(autoincrement())
-  name String @unique
+  id             Int           @id @default(autoincrement())
+  name           String        @unique
+  platformTypeId Int
+  platformType   PlatformType? @relation(fields: [platformTypeId], references: [id])
+  donation       Donation[]
 
   @@map("platforms")
+}
+
+model PlatformType {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
+  platform Platform[]
+
+  @@map("platform_types")
 }

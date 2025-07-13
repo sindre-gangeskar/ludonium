@@ -2,6 +2,9 @@
   "name": "project-giveaway",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "seed": "bun prisma/seed.ts"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

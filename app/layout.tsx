@@ -5,6 +5,7 @@ import ThemeProvider from "@/components/theme/ThemeProvider";
 import { Container } from "@mui/joy";
 import Navbar from "@/components/ui/Navbar";
 import { SessionProvider } from "next-auth/react";
+import Background from "@/components/ui/Background";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -44,6 +45,7 @@ export default function RootLayout({
 					<ThemeProvider>
 						<Navbar />
 						<Container maxWidth={"xl"}>{children}</Container>
+						<Background gridSize={40} maskSize={80} dotSize={1.5}/>
 					</ThemeProvider>
 				</SessionProvider>
 			</body>

@@ -1,14 +1,28 @@
-import { Platform } from "@/lib/definitions";
+import { PlatformProps, PlatformTypeProps } from "@/lib/definitions";
 import prisma from "@/lib/prisma/prisma";
 
 async function seed() {
 	try {
-		const platforms: Platform[] = [{ name: "steam" }, { name: "xbox" }, { name: "playstation" }];
+		const platforms: PlatformProps[] = [
+			{ name: "steam", platformTypeId: 1 },
+			{ name: "epic", platformTypeId: 1 },
+			{ name: "gog", platformTypeId: 1 },
+			{ name: "ea", platformTypeId: 1 },
+			{ name: "ubisoft", platformTypeId: 1 },
+			{ name: "switch", platformTypeId: 2 },
+			{ name: "xbox", platformTypeId: 2 },
+			{ name: "playstation", platformTypeId: 2 },
+		];
+		const platformTypes: PlatformTypeProps[] = [{ name: "pc" }, { name: "console" }];
+
+		for (const type of platformTypes) {
+			await prisma.platformType.upsert({ where: { name: type.name }, create: { ...type }, update: {} });
+		}
 
 		for (const platform of platforms) {
 			await prisma.platform.upsert({
 				where: { name: platform.name },
-				create: { name: platform.name },
+				create: { name: platform.name, platformTypeId: platform.platformTypeId },
 				update: {},
 			});
 		}
