@@ -1,60 +1,70 @@
 "use client";
-import { Avatar, Box, Button, Card, Container, Skeleton, Stack, Typography, Tooltip } from "@mui/joy";
+import { Box, Button, Container, Stack } from "@mui/joy";
 import ThemeToggler from "../theme/ThemeToggler";
-import { signOut, useSession } from "next-auth/react";
-import { SxProps } from "@mui/joy/styles/types";
-import { LogoutRounded } from "@mui/icons-material";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import UserDisplay from "./UserDisplay";
+import { LocationProps } from "@/lib/definitions";
+import NavCollapsedMenu from "./NavCollapsedMenu";
+import { useState } from "react";
+import { Menu } from "@mui/icons-material";
 export default function Navbar() {
+	const [collapsed, setCollapsed] = useState<boolean>(true);
 	const { status, data } = useSession();
-
-	const locations: { name: string; href: string }[] = [
+	const locations: LocationProps[] = [
 		{ name: "Home", href: "/" },
 		{ name: "Discord Community", href: "/community" },
-		...(status === "authenticated" ? [{ name: "Donate", href: "/donate" }] : []),
+		...(status === "authenticated"
+			? [
+					{ name: "Donate", href: "/donate" },
+					{ name: "My donations", href: "/donations" },
+			  ]
+			: []),
 	];
 
-	const avatarSx: SxProps = { width: 50, height: 50 };
-	const cardSx: SxProps = { minWidth: 200, height: 80, display: "flex", alignItems: "center", flexDirection: "row", background: "transparent" };
-
 	return (
-		<Box component={"nav"} sx={{ backdropFilter: "blur(4px)", background: "transparent", height: "80px", alignItems: "center", display: "flex" }}>
+		<Box
+			component={"nav"}
+			sx={{ zIndex: 100, position: "sticky", top: 0, backdropFilter: "blur(4px)", background: "transparent", height: "auto", alignItems: "center", display: "flex", flexDirection: "column", py: 2 }}>
 			<Container maxWidth={"lg"}>
-				<Stack direction={"row"} sx={{ alignItems: "center", width: "100%", my: "auto", justifyContent: "space-between" }}>
-					{status === "loading" && (
-						<Card orientation="horizontal" color="primary" variant="plain" sx={{ ...cardSx }}>
-							<Skeleton width={"inherit"} variant="circular" sx={{ ...avatarSx }}></Skeleton>
-							<Skeleton sx={{ flex: 1 }} width={"fit-content"} variant="text"></Skeleton>
-						</Card>
-					)}
-					{status === "authenticated" && (
-						<>
-							<Card orientation="horizontal" color="neutral" variant="plain" sx={{ ...cardSx }}>
-								<Avatar src={data?.user?.image ? data.user.image : ""} sx={{ ...avatarSx }} alt="profile"></Avatar>
-								<Typography>{data?.user?.name}</Typography>
-								<form
-									action={async () => {
-										await signOut();
-									}}>
-									<Tooltip variant="soft" title={"Log out"} arrow={true}>
-										<Button type="submit" color={"primary"} variant="solid" popover="auto">
-											<LogoutRounded />
-										</Button>
-									</Tooltip>
-								</form>
-							</Card>
-						</>
-					)}
-
-					<Stack direction={"row"} sx={{ position: "absolute", mx: "auto", left: "50%", transform: "translateX(-50%)" }}>
+				<Stack direction={"row"} sx={{ alignContent: "center", alignItems: "center", justifyContent: "center" }}>
+					<Box sx={{ display: { xs: "none", md: "inherit" } }}>
+						<UserDisplay status={status} data={data}></UserDisplay>
+					</Box>
+					{/* Navigation */}
+					<Stack
+						direction={"row"}
+						sx={{
+							justifyContent: "center",
+							position: "absolute",
+							left: "50%",
+							transform: "translateX(-50%)",
+							flex: 1,
+							flexGrow: 2,
+							flexBasis: "fit-content",
+							gap: 2,
+							display: { xs: "none", md: "inherit" },
+						}}>
 						{locations.map(item => (
-							<Button variant="plain" color="neutral" size="lg" key={item.name} component={Link} href={item.href}>
+							<Button variant="plain" color="primary" key={item.name} component={Link} href={item.href} sx={{ textWrap: "nowrap" }}>
 								{item.name}
 							</Button>
 						))}
 					</Stack>
+					<Button
+						variant="plain"
+						size="lg"
+						sx={{ display: { md: "none", pointerEvents: { md: "none" } } }}
+						onClick={() => {
+							setCollapsed(prev => !prev);
+						}}>
+						<Menu></Menu>
+					</Button>
 					<ThemeToggler />
 				</Stack>
+			</Container>
+			<Container maxWidth={"sm"}>
+				<NavCollapsedMenu locations={locations} collapsed={collapsed} />
 			</Container>
 		</Box>
 	);

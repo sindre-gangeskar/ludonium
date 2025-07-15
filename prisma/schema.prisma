@@ -25,10 +25,13 @@ model Key {
 model Donation {
   id         Int       @id @default(autoincrement())
   keyId      Int       @unique
-  key        Key?      @relation(fields: [keyId], references: [id])
-  discordId Int
+  gameName String
+  key        Key?      @relation(fields: [keyId], references: [id], onDelete: Cascade)
+  discordId  String
   platformId Int
   platform   Platform? @relation(fields: [platformId], references: [id])
+  platformTypeId Int
+  platformType PlatformType? @relation(fields: [platformTypeId], references: [id])
 
   @@map("donations")
 }
@@ -47,6 +50,7 @@ model PlatformType {
   id       Int        @id @default(autoincrement())
   name     String     @unique
   platform Platform[]
+  donation Donation[]
 
   @@map("platform_types")
 }

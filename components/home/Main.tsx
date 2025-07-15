@@ -4,25 +4,26 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import Login from "../auth/Login";
 import { SxProps } from "@mui/joy/styles/types";
-
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 export default function Main() {
 	const { status } = useSession();
-	const cardSx: SxProps = { background: 'transparent', backdropFilter: 'blur(4px)' };
+	const cardSx: SxProps = { backdropFilter: "blur(4px)" };
+
+	useGSAP(() => {
+		gsap.set("#title, #hero, #sub", { opacity: 0, y: -100 });
+		gsap.to('#title, #hero, #sub', {opacity: 1, duration: 1.7, delay: 0, ease: "back.out", stagger: 0.1, y: 0})
+	});
+
 	return (
-		<Box component={"section"}>
-			<Stack justifyContent={"center"} direction={"column"}>
-				<Typography level="h1" textAlign={"center"} sx={{ fontSize: "4rem" }}>
-					Giving back to your own discord community
-				</Typography>
-			</Stack>
-			<Card variant="outlined" sx={{ maxWidth: "md", p: 0, mx: "auto", my: 4, gap: 0, ...cardSx }}>
-				<Typography
-					color="primary"
-					variant="solid"
-					level="h1"
-					p={2}
-					m={0}
-					sx={{ borderRadius: "inherit", borderEndStartRadius: 0, borderEndEndRadius: 0, textTransform: "uppercase", fontWeight: "900", mb: 0 }}>
+		<Box component={"section"} sx={{ my: 2 }}>
+			<Typography id="title" level="h1" textAlign={"center"} sx={{ my: 4 }}>
+				Giving back to your own discord community
+			</Typography>
+
+			{/* Hero Card */}
+			<Card id="hero" color="primary" invertedColors variant="solid" sx={{ maxWidth: "md", mx: "auto", gap: 0, ...cardSx, p: { xs: 0, md: 2 } }}>
+				<Typography color="primary" variant="plain" level="h2" p={2} m={0} sx={{ borderRadius: "inherit", borderEndStartRadius: 0, borderEndEndRadius: 0, mb: 0, textAlign: { xs: "center", md: "inherit" } }}>
 					How does it work?
 				</Typography>
 				<CardContent sx={{ p: 2 }}>
@@ -50,25 +51,21 @@ export default function Main() {
 				</CardContent>
 			</Card>
 
-			<Stack direction={"column"} sx={{ alignItems: "center", justifyContent: "center", mt: 2 }}>
-				<Stack gap={2}>
-					{status == "authenticated" ? (
-						<>
-							<Card variant="outlined" sx={{...cardSx}}>
-								<CardContent sx={{px: 2}}>
-									<Typography level="title-md">If this sounds interesting, click on the button below to start the donation process!</Typography>
-								</CardContent>
-								<CardActions>
-									<Button size="lg" variant="solid" component={Link} href="/donate">
-										Take me to the donation page
-									</Button>
-								</CardActions>
-							</Card>
-						</>
-					) : (
-						<Login />
-					)}
-				</Stack>
+			<Stack id="sub" direction={"column"} sx={{ alignItems: "center", justifyContent: "center", mt: 2, my: 4 }}>
+				{status == "authenticated" ? (
+					<Card size="sm" variant="solid" invertedColors color="primary" sx={{ ...cardSx }}>
+						<CardContent sx={{ px: 2 }}>
+							<Typography level="title-sm">If this sounds interesting, click on the button below to start the donation process!</Typography>
+						</CardContent>
+						<CardActions>
+							<Button variant="solid" component={Link} href="/donate">
+								Take me to the donation page
+							</Button>
+						</CardActions>
+					</Card>
+				) : (
+					<Login />
+				)}
 			</Stack>
 		</Box>
 	);

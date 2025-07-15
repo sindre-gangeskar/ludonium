@@ -29,7 +29,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 				styleOverrides: {
 					root: {
 						transition: "background-color 250ms ease, color 250ms ease",
-						fontFamily: "var(--font-ginto-discord)",
+						fontFamily: "var(--font-noto-sans)",
 					},
 				},
 			},
@@ -49,7 +49,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 	}, []);
 
 	return !isHydrated ? null : (
-		<CssVarsProvider defaultColorScheme={"dark"} modeStorageKey="mui-mode" theme={customTheme} disableNestedContext>
+		<CssVarsProvider colorSchemeStorageKey="mui-mode" theme={customTheme} disableNestedContext>
 			{children}
 		</CssVarsProvider>
 	);
