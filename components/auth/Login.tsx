@@ -6,9 +6,9 @@ export default function Login() {
 	const { status } = useSession();
 	return status === "unauthenticated" ? (
 		<form action={login}>
-			<Card invertedColors variant="solid" color="primary" size="sm" sx={{ width: "fit-content", mt: 5, maxWidth: 'sm' }}>
+			<Card variant="soft" color="neutral" size="lg" sx={{ width: "fit-content", mt: 5, maxWidth: "sm" }}>
 				<Typography level="title-sm">
-					In order to donate, logging in via your <strong>Discord</strong> account is necessary. <br/> {"Here's why:"}
+					In order to donate, logging in via your <strong>Discord</strong> account is necessary. <br /> {"Here's why:"}
 				</Typography>
 				<CardContent>
 					<List marker={"disc"}>
@@ -21,7 +21,7 @@ export default function Login() {
 					</List>
 				</CardContent>
 				<CardActions>
-					<Button sx={{ mx: "auto" }} type="submit">
+					<Button size="lg" sx={{ mx: "auto", maxWidth: 'fit-content' }} type="submit" color="secondary">
 						Sign in via Discord{" "}
 					</Button>
 				</CardActions>

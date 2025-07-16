@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, Container, Stack } from "@mui/joy";
+import { Box, Button, Container, Stack, useColorScheme } from "@mui/joy";
 import ThemeToggler from "../theme/ThemeToggler";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -8,7 +8,10 @@ import { LocationProps } from "@/lib/definitions";
 import NavCollapsedMenu from "./NavCollapsedMenu";
 import { useState } from "react";
 import { Menu } from "@mui/icons-material";
+import { usePathname } from "next/navigation";
 export default function Navbar() {
+	const { mode } = useColorScheme();
+	const pathname = usePathname();
 	const [collapsed, setCollapsed] = useState<boolean>(true);
 	const { status, data } = useSession();
 	const locations: LocationProps[] = [
@@ -17,7 +20,7 @@ export default function Navbar() {
 		...(status === "authenticated"
 			? [
 					{ name: "Donate", href: "/donate" },
-					{ name: "My donations", href: "/donations" },
+					{ name: "My Stats", href: "/donations" },
 			  ]
 			: []),
 	];
@@ -34,7 +37,9 @@ export default function Navbar() {
 					{/* Navigation */}
 					<Stack
 						direction={"row"}
-						sx={{
+						sx={theme => ({
+							backgroundColor: mode === "dark" ? `${theme.palette.neutral[800]}` : `${theme.palette.neutral[100]}`,
+							borderRadius: "1.5rem",
 							justifyContent: "center",
 							position: "absolute",
 							left: "50%",
@@ -44,9 +49,16 @@ export default function Navbar() {
 							flexBasis: "fit-content",
 							gap: 2,
 							display: { xs: "none", md: "inherit" },
-						}}>
+						})}>
 						{locations.map(item => (
-							<Button variant="plain" color="primary" key={item.name} component={Link} href={item.href} sx={{ textWrap: "nowrap" }}>
+							<Button
+								size="lg"
+								variant={pathname === `${item.href}` ? "solid" : "soft"}
+								color={pathname === `${item.href}` ? "primary" : "neutral"}
+								key={item.name}
+								component={Link}
+								href={item.href}
+								sx={{ textWrap: "nowrap" }}>
 								{item.name}
 							</Button>
 						))}

@@ -1,18 +1,19 @@
 "use client";
-import { Box, List, ListItem, Stack, Typography, Button, Card, CardContent, CardActions } from "@mui/joy";
+import { Box, Stack, Typography, Button, Card, CardContent, CardActions } from "@mui/joy";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import Login from "../auth/Login";
 import { SxProps } from "@mui/joy/styles/types";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import Tile from "./Tile";
 export default function Main() {
 	const { status } = useSession();
 	const cardSx: SxProps = { backdropFilter: "blur(4px)" };
 
 	useGSAP(() => {
-		gsap.set("#title, #hero, #sub", { opacity: 0, y: -100 });
-		gsap.to('#title, #hero, #sub', {opacity: 1, duration: 1.7, delay: 0, ease: "back.out", stagger: 0.1, y: 0})
+		gsap.set("#title, .detail, #sub", { opacity: 0, y: -100 });
+		gsap.to("#title, .detail, #sub", { opacity: 1, duration: 1.7, delay: 0, ease: "back.out", stagger: 0.1, y: 0 });
 	});
 
 	return (
@@ -21,44 +22,23 @@ export default function Main() {
 				Giving back to your own discord community
 			</Typography>
 
-			{/* Hero Card */}
-			<Card id="hero" color="primary" invertedColors variant="solid" sx={{ maxWidth: "md", mx: "auto", gap: 0, ...cardSx, p: { xs: 0, md: 2 } }}>
-				<Typography color="primary" variant="plain" level="h2" p={2} m={0} sx={{ borderRadius: "inherit", borderEndStartRadius: 0, borderEndEndRadius: 0, mb: 0, textAlign: { xs: "center", md: "inherit" } }}>
-					How does it work?
-				</Typography>
-				<CardContent sx={{ p: 2 }}>
-					<List marker="disc">
-						<ListItem>
-							<Typography level="title-sm">
-								Give away game keys to the members of your discord community. By donating using this system you will give every member of the discord community a fair chance to win. 👑
-							</Typography>
-						</ListItem>
-						<ListItem>
-							<Typography level="title-sm">
-								Once you have donated, a giveaway will be initiated on the discord server for each member to participate in. This prevents bots from scraping keys and members from redeeming and ghosting the donator.{" "}
-								👻
-							</Typography>
-						</ListItem>
-						<ListItem>
-							<Typography level="title-sm">
-								Receive a <strong>unique</strong> role as a donator in the server for the people in the community to recognize your generosity. 💝
-							</Typography>
-						</ListItem>
-						<ListItem>
-							<Typography level="title-sm">The giveaway itself will not reveal any information about the donator to maintain anonomity for each donation. 🎭</Typography>
-						</ListItem>
-					</List>
-				</CardContent>
-			</Card>
+			<Stack gap={3} direction={"row"} sx={{ maxWidth: "lg", mx: "auto", justifyContent: "center", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 0fr))" }}>
+				<Tile className="detail" title="Donate Games" description="Donate your games back to your own Discord community." />
+				<Tile className="detail" title="No Ghosting" description="Prevents players from taking keys and ghosting the donator." />
+				<Tile className="detail" title="No Scraping" description="Using this system will help prevent bots from scraping the Discord server chat for keys." />
+				<Tile className="detail" title="Giveaway" description="Gives everyone an equal chance at participating." />
+				<Tile className="detail" title="Winning & Feedback" description="The winner receives the key via a DM from a bot and gets the option to provide feedback on the key's validity." />
+				<Tile className="detail" title="Unique Role" description="Receive a unique role to showcase your generosity." />
+			</Stack>
 
 			<Stack id="sub" direction={"column"} sx={{ alignItems: "center", justifyContent: "center", mt: 2, my: 4 }}>
 				{status == "authenticated" ? (
-					<Card size="sm" variant="solid" invertedColors color="primary" sx={{ ...cardSx }}>
+					<Card size="lg" variant="soft" color="neutral" sx={{ ...cardSx }}>
 						<CardContent sx={{ px: 2 }}>
-							<Typography level="title-sm">If this sounds interesting, click on the button below to start the donation process!</Typography>
+							<Typography level="title-md">If this sounds interesting, click on the button below to start the donation process!</Typography>
 						</CardContent>
 						<CardActions>
-							<Button variant="solid" component={Link} href="/donate">
+							<Button size="lg" sx={{ maxWidth: "fit-content", mx: "auto" }} variant="solid" color="secondary" component={Link} href="/donate">
 								Take me to the donation page
 							</Button>
 						</CardActions>

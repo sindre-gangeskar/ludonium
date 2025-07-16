@@ -1,12 +1,14 @@
 "use client";
 import { PlatformProps, PlatformTypeProps, PlatformTypes } from "@/lib/definitions";
-import { Box, Button, Radio, Card, CardActions, CardContent, FormControl, Input, Typography, RadioGroup, Checkbox, useColorScheme, FormLabel } from "@mui/joy";
+import { Box, Button, Radio, Card, CardActions, CardContent, FormControl, Input, Typography, RadioGroup, Checkbox, useColorScheme, FormLabel, Stack } from "@mui/joy";
 import { SxProps } from "@mui/joy/styles/types";
 import { useActionState, useState } from "react";
 import Terms from "./Terms";
 import { useSession } from "next-auth/react";
 import { submitDonation } from "@/app/donate/actions";
 import DonationSuccess from "./DonationSuccess";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 export default function FormDisplay({ platforms, platformTypes }: { platforms: PlatformProps[]; platformTypes: PlatformTypeProps[] }) {
 	const [agreed, setAgreed] = useState<boolean>(false);
 	const [activePlatformType, setActivePlatformType] = useState<PlatformTypes>("pc");
@@ -16,8 +18,7 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 	const consolePlatforms = platforms.filter(platform => platform?.platformType?.name === "console");
 	const pcPlatforms = platforms.filter(platform => platform?.platformType?.name === "pc");
 	const { mode } = useColorScheme();
-
-	const formControlSx: SxProps = {};
+	const cardSx: SxProps = { borderRadius: "1.25rem" };
 
 	const getDefaultPlatform = (platformType: PlatformTypes) => {
 		if (platformType === "pc") return pcPlatforms[0];
@@ -26,18 +27,31 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 	const updateAgreement = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAgreed(e.target.checked);
 	};
+	useGSAP(() => {
+		const tl = gsap.timeline();
+
+		tl.set(".label", { opacity: 0, filter: "blur(16px)" });
+		tl.set(".input-card", { opacity: 0, x: 100 });
+		gsap.to(".input-card", { opacity: 1, x: 0, duration: 1, stagger: 0.2, ease: "power2.out" });
+		gsap.to(".label", { opacity: 1, filter: "blur(0px)", duration: 0.8, delay: 0.6, ease: "power1.out" });
+	});
 
 	return platforms.length && platformTypes.length > 0 ? (
 		state?.status === "success" ? (
 			<DonationSuccess />
 		) : (
-			<Card sx={{ maxWidth: "md", mx: "auto", my: 4, px: 4, py: 2 }}>
-				<form action={dispatch}>
-					<input name="discordId" defaultValue={data?.user?.id} type="hidden"></input>
-					<CardContent sx={{ gap: 2 }}>
-						{/* Platform Type Selection */}
-						<FormControl sx={{ ...formControlSx }}>
-							<Typography level="title-sm">Select PC or Console</Typography>
+			<Stack component={"form"} action={dispatch} rowGap={"column"} gap={2} sx={{ maxWidth: "sm", mx: "auto", my: 4 }}>
+				<Typography className="label" level="h1" textAlign={"center"}>
+					Donate Game Submission
+				</Typography>
+				<input name="discordId" defaultValue={data?.user?.id} type="hidden"></input>
+				{/* Platform Type Selection */}
+				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft">
+					<CardContent>
+						<FormControl>
+							<Typography className="label" level="title-sm">
+								Select PC or Console
+							</Typography>
 							<RadioGroup orientation="horizontal" defaultValue={platformTypes[0].id} sx={{ gap: 2, my: 2, justifyContent: "center" }}>
 								{platformTypes.map(type => (
 									<Button
@@ -56,13 +70,20 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 										value={type.id}
 										key={type.id}
 										name="platformTypeId"
-										sx={{ textTransform: type.name === "console" ? "capitalize" : "uppercase", maxWidth: 'fit-content' }}></Button>
+										sx={{ textTransform: type.name === "console" ? "capitalize" : "uppercase", maxWidth: "fit-content" }}></Button>
 								))}
 							</RadioGroup>
 						</FormControl>
-						{/* Platform Selection */}
-						<FormControl sx={{ ...formControlSx }}>
-							<Typography level="title-sm">Select Platform</Typography>
+					</CardContent>
+				</Card>
+
+				{/* Platform Selection */}
+				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft">
+					<CardContent>
+						<FormControl>
+							<Typography className="label" level="title-sm">
+								Select Platform
+							</Typography>
 							<Box component={"div"} sx={{ width: "100%" }}>
 								<RadioGroup
 									id={"platform"}
@@ -81,12 +102,11 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 											activePlatformType === platform?.platformType?.name && (
 												<Button
 													size="lg"
-													color={activePlatform.name === platform.name ? "primary" : "neutral"}
-													variant={activePlatform.name === platform.name ? "solid" : "soft"}
+													color={"primary"}
+													variant={activePlatform.name === platform.name ? "solid" : "outlined"}
 													component={Radio}
 													onChange={() => {
 														setActivePlatform({ name: platform.name, id: platform.id });
-
 														if (platform.platformType && platform.platformType.name) {
 															setActivePlatformType(platform.platformType.name as PlatformTypes);
 														}
@@ -106,35 +126,45 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 								</RadioGroup>
 							</Box>
 						</FormControl>
-						{/* Game Name Input */}
-						<FormControl sx={{ ...formControlSx }}>
-							<FormLabel>Game name</FormLabel>
-							<Input required name="gameName" variant={mode === "dark" ? "outlined" : "soft"} color="neutral" placeholder="Enter the name of the game here" autoComplete="gameName"></Input>
-						</FormControl>
-						{/* Game Key Input */}
+					</CardContent>
+				</Card>
+
+				{/* Game Title Input */}
+				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft">
+					<CardContent>
 						<FormControl>
-							<FormLabel>Game key</FormLabel>
+							<FormLabel className="label">Game Title</FormLabel>
+							<Input required name="gameName" variant={mode === "dark" ? "outlined" : "soft"} color="neutral" placeholder="Enter the title of the game here" autoComplete="gameName"></Input>
+						</FormControl>
+					</CardContent>
+				</Card>
+
+				{/* Game Key Input */}
+				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft">
+					<CardContent>
+						<FormControl>
+							<FormLabel className="label">Game key</FormLabel>
 							<Input name={"key"} placeholder={`Enter your ${activePlatform.name} key here...`}></Input>
 						</FormControl>
 					</CardContent>
+				</Card>
+
+				{/* Submission */}
+				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft" color="neutral">
+					<CardContent>
+						<Terms />
+					</CardContent>
 					<CardActions>
-						<Card color="danger" variant="outlined" sx={{ my: 2 }}>
-							<CardContent>
-								<Terms />
-							</CardContent>
-							<CardActions>
-								<Checkbox sx={{ mx: "auto", flex: 1 }} label={"I agree to these terms"} onChange={updateAgreement}></Checkbox>
-								<Button loading={isPending} sx={{ flex: 1 }} type="submit" size="lg" disabled={!agreed} color="success">
-									Submit donation
-								</Button>
-							</CardActions>
-						</Card>
+						<Checkbox sx={{ mx: "auto", flex: 1 }} label={"I agree to these terms"} onChange={updateAgreement}></Checkbox>
+						<Button loading={isPending} sx={{ flex: 1 }} type="submit" size="lg" disabled={!agreed} color="secondary">
+							Submit donation
+						</Button>
 					</CardActions>
-				</form>
-			</Card>
+				</Card>
+			</Stack>
 		)
 	) : (
-		<Card sx={{ maxWidth: "sm", mt: 5, mx: "auto" }}>
+		<Card className="input-card" sx={{ maxWidth: "sm", mt: 5, mx: "auto" }}>
 			<CardContent>
 				<Typography level="title-md">Donations are currently not available.</Typography>
 				<Typography level="title-sm" color="warning">

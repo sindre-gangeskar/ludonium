@@ -11,7 +11,7 @@ export default function ThemeToggler() {
 	};
 
 	return (
-		<Button onClick={toggleTheme} variant="outlined" sx={{ borderRadius: "1rem", ml: 'auto', flexGrow: 0 }}>
+		<Button onClick={toggleTheme} color="secondary" variant="soft" sx={{ borderRadius: "1rem", ml: 'auto', flexGrow: 0 }}>
 			{mode === "dark" ? <Brightness1Rounded/> : <Brightness2Rounded/>}
 		</Button>
 	);

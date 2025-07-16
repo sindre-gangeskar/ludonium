@@ -24,7 +24,7 @@ export interface Key {
 }
 
 export interface BackgroundProps {
-	style?: "circle" | "ellipsis";
+	style?: "circle" | "ellipse";
 	gridSize?: 20 | 40 | 60 | 80;
 	color?: ColorPaletteProp;
 	maskSize?: 20 | 40 | 60 | 80 | 100;

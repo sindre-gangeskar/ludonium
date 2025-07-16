@@ -45,7 +45,7 @@ export default function RootLayout({
 					<ThemeProvider>
 						<Navbar />
 						<Container maxWidth={"xl"}>{children}</Container>
-						<Background gridSize={40} maskSize={100} dotSize={1}/>
+						<Background style="ellipse" maskSize={80}/>
 					</ThemeProvider>
 				</SessionProvider>
 			</body>
