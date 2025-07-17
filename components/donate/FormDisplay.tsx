@@ -1,6 +1,6 @@
 "use client";
 import { PlatformProps, PlatformTypeProps, PlatformTypes } from "@/lib/definitions";
-import { Box, Button, Radio, Card, CardActions, CardContent, FormControl, Input, Typography, RadioGroup, Checkbox, useColorScheme, FormLabel, Stack } from "@mui/joy";
+import { Box, Button, Radio, Card, CardActions, CardContent, FormControl, Input, Typography, RadioGroup, Checkbox, FormLabel, Stack } from "@mui/joy";
 import { SxProps } from "@mui/joy/styles/types";
 import { useActionState, useState } from "react";
 import Terms from "./Terms";
@@ -17,7 +17,6 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 	const [state, dispatch, isPending] = useActionState(submitDonation, null);
 	const consolePlatforms = platforms.filter(platform => platform?.platformType?.name === "console");
 	const pcPlatforms = platforms.filter(platform => platform?.platformType?.name === "pc");
-	const { mode } = useColorScheme();
 	const cardSx: SxProps = { borderRadius: "1.25rem" };
 
 	const getDefaultPlatform = (platformType: PlatformTypes) => {
@@ -54,11 +53,10 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 							</Typography>
 							<RadioGroup orientation="horizontal" defaultValue={platformTypes[0].id} sx={{ gap: 2, my: 2, justifyContent: "center" }}>
 								{platformTypes.map(type => (
-									<Button
+									<Radio
 										size="lg"
-										color={activePlatformType === type.name ? "primary" : "neutral"}
-										variant={activePlatformType == type.name ? "solid" : "soft"}
-										component={Radio}
+										color={"secondary"}
+										variant={"outlined"}
 										onChange={() => {
 											setActivePlatformType(type.name as PlatformTypes);
 											setActivePlatform({
@@ -70,7 +68,7 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 										value={type.id}
 										key={type.id}
 										name="platformTypeId"
-										sx={{ textTransform: type.name === "console" ? "capitalize" : "uppercase", maxWidth: "fit-content" }}></Button>
+										sx={{ textTransform: type.name === "console" ? "capitalize" : "uppercase", maxWidth: "fit-content" }}></Radio>
 								))}
 							</RadioGroup>
 						</FormControl>
@@ -94,17 +92,17 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 										gap: 2,
 										my: 2,
 										display: "grid",
-										gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-										textAlign: "start",
+										gridTemplateColumns: "repeat(auto-fit, minmax(150px, 0fr))",
+										justifyItems: "center",
+										justifyContent: "center",
 									}}>
 									{platforms.map(
 										platform =>
 											activePlatformType === platform?.platformType?.name && (
-												<Button
+												<Radio
 													size="lg"
-													color={"primary"}
-													variant={activePlatform.name === platform.name ? "solid" : "outlined"}
-													component={Radio}
+													color={"secondary"}
+													variant={"outlined"}
 													onChange={() => {
 														setActivePlatform({ name: platform.name, id: platform.id });
 														if (platform.platformType && platform.platformType.name) {
@@ -117,10 +115,10 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 													name="platformId"
 													sx={{
 														textTransform: platform.name !== "ea" ? "capitalize" : "uppercase",
-														width: "100%",
 														mx: "auto",
-														alignContent: "center",
-													}}></Button>
+														minWidth: "150px",
+														textAlign: "center",
+													}}></Radio>
 											)
 									)}
 								</RadioGroup>
@@ -134,7 +132,7 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 					<CardContent>
 						<FormControl>
 							<FormLabel className="label">Game Title</FormLabel>
-							<Input required name="gameName" variant={mode === "dark" ? "outlined" : "soft"} color="neutral" placeholder="Enter the title of the game here" autoComplete="gameName"></Input>
+							<Input required color="secondary" name="gameName" placeholder="Enter the title of the game here" autoComplete="gameName"></Input>
 						</FormControl>
 					</CardContent>
 				</Card>
@@ -144,7 +142,7 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 					<CardContent>
 						<FormControl>
 							<FormLabel className="label">Game key</FormLabel>
-							<Input name={"key"} placeholder={`Enter your ${activePlatform.name} key here...`}></Input>
+							<Input required color="secondary" name={"key"} placeholder={`Enter your ${activePlatform.name} key here...`}></Input>
 						</FormControl>
 					</CardContent>
 				</Card>

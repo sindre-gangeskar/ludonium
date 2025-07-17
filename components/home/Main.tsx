@@ -26,7 +26,7 @@ export default function Main() {
 				<Tile className="detail" title="Donate Games" description="Donate your games back to your own Discord community." />
 				<Tile className="detail" title="No Ghosting" description="Prevents players from taking keys and ghosting the donator." />
 				<Tile className="detail" title="No Scraping" description="Using this system will help prevent bots from scraping the Discord server chat for keys." />
-				<Tile className="detail" title="Giveaway" description="Gives everyone an equal chance at participating." />
+				<Tile className="detail" title="Giveaway" description="Gives everyone an equal chance at participating and winning." />
 				<Tile className="detail" title="Winning & Feedback" description="The winner receives the key via a DM from a bot and gets the option to provide feedback on the key's validity." />
 				<Tile className="detail" title="Unique Role" description="Receive a unique role to showcase your generosity." />
 			</Stack>

@@ -17,6 +17,7 @@ export default function Background({ style = "circle", maskSize = 60 }: Backgrou
 					zIndex: -1,
 					transition: "250ms ease",
 					overflow: "hidden",
+					background: "var(--joy-palette-neutral-softBg)",
 					"&::before": {
 						transition: "inherit",
 						content: '""',
@@ -25,8 +26,8 @@ export default function Background({ style = "circle", maskSize = 60 }: Backgrou
 						height: "100%",
 						width: "100%",
 						background: `
-						radial-gradient(circle at 150% 120%, ${applyGradientColors(theme, mode).center} 0%, ${applyGradientColors(theme, mode).edge} 50%, transparent),
-						radial-gradient(circle at 0% 0%, ${applyGradientColors(theme, mode, "secondary").center} 0%, ${applyGradientColors(theme, mode).edge} 50%, transparent)`,
+						radial-gradient(circle at 160% 150%, ${applyGradientColors(theme, mode).center} 0%, ${applyGradientColors(theme, mode).edge} 50%, transparent),
+						radial-gradient(circle at -50% 0%, ${applyGradientColors(theme, mode, "secondary").center} 0%, ${applyGradientColors(theme, mode).edge} 50%, transparent)`,
 						zIndex: -5,
 					},
 				})}></Box>

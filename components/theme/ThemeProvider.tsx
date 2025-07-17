@@ -44,6 +44,14 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 					},
 				},
 			},
+			JoyInput: {
+				styleOverrides: {
+					root: {
+						borderRadius: "1.5rem",
+						overflow: "hidden",
+					},
+				},
+			},
 			JoyTypography: {
 				styleOverrides: {
 					root: {
@@ -73,7 +81,7 @@ function generateColorVariables(color: ColorPaletteProp) {
 			solidColor: "var(--joy-palette-neutral-50)",
 			solidActiveBg: `var(--joy-palette-${color}-500)`,
 			outlinedBorder: `var(--joy-palette-${color}-500)`,
-			outlinedColor: `var(--joy-palette-${color}-700)`,
+			outlinedColor: `var(--joy-palette-${color}-50)`,
 			outlinedActiveBg: `var(--joy-palette-${color}-100)`,
 			softColor: `var(--joy-palette-${color}-400)`,
 			softBg: `var(--joy-palette-${color}-900)`,
