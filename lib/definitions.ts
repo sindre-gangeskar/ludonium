@@ -1,7 +1,8 @@
 import { ColorPaletteProp } from "@mui/joy/styles/types";
+
 export interface PlatformProps {
 	id?: number;
-	name: string | "steam" | "ea" | "gog" | "epic" | "ubisoft" | "switch" | "playstation" | "xbox";
+	name: "steam" | "ea" | "gog" | "epic" | "ubisoft" | "switch" | "playstation" | "xbox";
 	platformTypeId?: number;
 	platformType?: PlatformTypeProps | null;
 }
@@ -47,10 +48,13 @@ export interface LocationProps {
 	href: string;
 }
 
+export type StateProps = string;
+
 export interface ResponseProps {
 	status: "success" | "error" | "fail";
 	statusCode: 200 | 201 | 400 | 401 | 409 | 500;
 	message?: string;
+	errorType?: StateProps;
 	data?: unknown;
 }
 

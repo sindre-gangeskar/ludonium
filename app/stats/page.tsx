@@ -1,4 +1,4 @@
-import { DonationsData } from "@/components/donations/DonationsData";
+import { DonationsData } from "@/components/stats/DonationsData";
 import { Typography } from "@mui/joy";
 import { Suspense } from "react";
 

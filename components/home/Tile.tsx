@@ -1,11 +1,21 @@
 "use client";
-import { Card, CardContent, Typography } from "@mui/joy";
-
-export default function Tile({ title, description, className }: { title: string; description: string; className?: string }) {
+import { Card, CardContent, ColorPaletteProp, Typography } from "@mui/joy";
+import { useColorScheme } from "@mui/joy";
+export default function Tile({ color = "primary", title, description, className }: { color?: ColorPaletteProp; title: string; description: string; className?: string }) {
+	const { mode } = useColorScheme();
 	return (
-		<Card className={className} color="neutral" variant="soft" size="lg" sx={{ width: "350px", maxWidth: "sm", aspectRatio: 2 / 1 }}>
+		<Card
+			className={className}
+			variant="plain"
+			size="lg"
+			sx={{
+				width: { xs: "100%", md: "500px" },
+				position: "relative",
+				overflow: "hidden",
+				...(mode === "dark" ? { background: "transparent" } : null),
+			}}>
 			<CardContent>
-				<Typography color="primary" level="h3">
+				<Typography color={color} level="h4">
 					{title}
 				</Typography>
 				<Typography level="title-md">{description}</Typography>

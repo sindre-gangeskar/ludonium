@@ -1,4 +1,4 @@
-import { getDonations } from "@/app/donations/actions";
+import { getDonations } from "@/app/stats/actions";
 import { auth } from "@/auth";
 import DonationsDisplay from "./DonationsDisplay";
 import { DonationProps } from "@/lib/definitions";

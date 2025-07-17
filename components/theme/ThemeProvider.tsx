@@ -7,7 +7,12 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 	const theme = useTheme();
 	const customTheme = extendTheme({
 		fontFamily: { body: "var(--font-noto-sans)" },
-
+		typography: {
+			h1: { fontFamily: "var(--font-comfortaa)" },
+			h2: { fontFamily: "var(--font-comfortaa)", fontWeight: 900 },
+			h3: { fontFamily: "var(--font-comfortaa)", fontWeight: 900 },
+			h4: { fontFamily: "var(--font-comfortaa)", fontWeight: 900 },
+		},
 		colorSchemes: {
 			dark: {
 				palette: {
@@ -49,6 +54,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 					root: {
 						borderRadius: "1.5rem",
 						overflow: "hidden",
+						minHeight: "2.8rem",
 					},
 				},
 			},
@@ -76,39 +82,43 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
 function generateColorVariables(color: ColorPaletteProp) {
 	return {
-		dark: {
-			solidBg: `var(--joy-palette-${color}-600)`,
-			solidColor: "var(--joy-palette-neutral-50)",
-			solidActiveBg: `var(--joy-palette-${color}-500)`,
-			outlinedBorder: `var(--joy-palette-${color}-500)`,
-			outlinedColor: `var(--joy-palette-${color}-50)`,
-			outlinedActiveBg: `var(--joy-palette-${color}-100)`,
-			softColor: `var(--joy-palette-${color}-400)`,
-			softBg: `var(--joy-palette-${color}-900)`,
-			softActiveBg: `var(--joy-palette-${color}-500)`,
-			plainColor: `var(--joy-palette-${color}-700)`,
-			plainActiveBg: `var(--joy-palette-${color}-100)`,
-			disabledBg: `var(--joy-palette-${color}-900)`,
-			solidDisabledColor: `var(--joy-palette-${color}-200)`,
-			solidDisabledBg: `var(--joy-palette-${color}-900)`,
-		},
-		light: {
-			solidBg: `var(--joy-palette-${color}-400)`,
-			solidColor: "var(--joy-palette-neutral-50)",
-			solidActiveBg: `var(--joy-palette-${color}-500)`,
-			outlinedBorder: `var(--joy-palette-${color}-500)`,
-			outlinedColor: `var(--joy-palette-${color}-700)`,
-			outlinedActiveBg: `var(--joy-palette-${color}-100)`,
-			softColor: `var(--joy-palette-${color}-500)`,
-			softBg: `var(--joy-palette-${color}-50)`,
-			softActiveBg: `var(--joy-palette-${color}-300)`,
-			plainColor: `var(--joy-palette-${color}-700)`,
-			plainActiveBg: `var(--joy-palette-${color}-100)`,
-			disabledBg: `var(--joy-palette-${color}-50)`,
-			solidDisabledColor: `var(--joy-palette-${color}-200)`,
-			solidDisabledBg: `var(--joy-palette-${color}-50)`,
-		},
-	};
+	dark: {
+		solidBg: `var(--joy-palette-${color}-600)`,
+		solidColor: "var(--joy-palette-neutral-50)",
+		solidActiveBg: `var(--joy-palette-${color}-500)`,
+		outlinedBorder: `var(--joy-palette-${color}-500)`,
+		outlinedColor: `var(--joy-palette-${color}-50)`,
+		outlinedActiveBg: `var(--joy-palette-${color}-100)`,
+		softColor: `var(--joy-palette-${color}-100)`,
+		softHoverColor: `var(--joy-palette-${color}-50)`,
+		softBg: `var(--joy-palette-${color}-900)`,
+		softHoverBg: `var(--joy-palette-${color}-800)`,
+		softActiveBg: `var(--joy-palette-${color}-500)`,
+		plainColor: `var(--joy-palette-${color}-300)`,
+		plainActiveBg: `var(--joy-palette-${color}-100)`,
+		disabledBg: `var(--joy-palette-${color}-900)`,
+		solidDisabledColor: `var(--joy-palette-neutral-500)`,
+		solidDisabledBg: `var(--joy-palette-neutral-800)`,
+	},
+	light: {
+		solidBg: `var(--joy-palette-${color}-500)`,
+		solidColor: "var(--joy-palette-neutral-50)",
+		solidActiveBg: `var(--joy-palette-${color}-500)`,
+		outlinedBorder: `var(--joy-palette-${color}-500)`,
+		outlinedColor: `var(--joy-palette-${color}-700)`,
+		outlinedActiveBg: `var(--joy-palette-${color}-100)`,
+		softColor: `var(--joy-palette-${color}-500)`,
+		softHoverColor: `var(--joy-palette-${color}-50)`,
+		softBg: `var(--joy-palette-${color}-50)`,
+		softActiveBg: `var(--joy-palette-${color}-300)`,
+		softHoverBg: `var(--joy-palette-${color}-200)`,
+		plainColor: `var(--joy-palette-${color}-700)`,
+		plainActiveBg: `var(--joy-palette-${color}-100)`,
+		disabledBg: `var(--joy-palette-${color}-50)`,
+		solidDisabledColor: `var(--joy-palette-neutral-400)`,
+		solidDisabledBg: `var(--joy-palette-neutral-100)`,
+	},
+};
 }
 
 function getCustomColorRGBValues(color: ColorPaletteProp) {

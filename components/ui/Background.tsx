@@ -1,8 +1,7 @@
 "use client";
 import { BackgroundProps } from "@/lib/definitions";
-import { Box, ColorPaletteProp, useColorScheme } from "@mui/joy";
-import { Theme } from "@mui/joy";
-
+import { Box, useColorScheme } from "@mui/joy";
+import { applyGradientColors } from "@/lib/utils";
 export default function Background({ style = "circle", maskSize = 60 }: BackgroundProps) {
 	const { mode } = useColorScheme();
 	return (
@@ -33,10 +32,4 @@ export default function Background({ style = "circle", maskSize = 60 }: Backgrou
 				})}></Box>
 		</Box>
 	);
-}
-
-function applyGradientColors(theme: Theme, mode: "dark" | "light" | "system" | undefined, color: ColorPaletteProp | "secondary" = "primary") {
-	if (mode === "dark") {
-		return { center: theme.palette[color][600], edge: theme.palette[color][900] };
-	} else return { center: theme.palette[color][50], edge: theme.palette[color][200] };
 }

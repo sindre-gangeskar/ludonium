@@ -21,7 +21,7 @@ export default function Login() {
 					</List>
 				</CardContent>
 				<CardActions>
-					<Button size="lg" sx={{ mx: "auto", maxWidth: 'fit-content' }} type="submit" color="secondary">
+					<Button size="lg" sx={{ mx: "auto", maxWidth: 'fit-content' }} type="submit" color="primary">
 						Sign in via Discord{" "}
 					</Button>
 				</CardActions>

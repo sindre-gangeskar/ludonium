@@ -29,10 +29,10 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 	useGSAP(() => {
 		const tl = gsap.timeline();
 
-		tl.set(".label", { opacity: 0, filter: "blur(16px)" });
+		tl.set(".input-card > *", { opacity: 0, filter: "blur(16px)" });
 		tl.set(".input-card", { opacity: 0, x: 100 });
 		gsap.to(".input-card", { opacity: 1, x: 0, duration: 1, stagger: 0.2, ease: "power2.out" });
-		gsap.to(".label", { opacity: 1, filter: "blur(0px)", duration: 0.8, delay: 0.6, ease: "power1.out" });
+		gsap.to(".input-card > *", { opacity: 1, filter: "blur(0px)", duration: 1.1, delay: 0.5, ease: "power4.out" });
 	});
 
 	return platforms.length && platformTypes.length > 0 ? (
@@ -131,7 +131,9 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft">
 					<CardContent>
 						<FormControl>
-							<FormLabel className="label">Game Title</FormLabel>
+							<FormLabel required className="label">
+								Game Title
+							</FormLabel>
 							<Input required color="secondary" name="gameName" placeholder="Enter the title of the game here" autoComplete="gameName"></Input>
 						</FormControl>
 					</CardContent>
@@ -141,8 +143,11 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft">
 					<CardContent>
 						<FormControl>
-							<FormLabel className="label">Game key</FormLabel>
+							<FormLabel required className="label">
+								Game Key
+							</FormLabel>
 							<Input required color="secondary" name={"key"} placeholder={`Enter your ${activePlatform.name} key here...`}></Input>
+							{state?.status === "fail" && state?.errorType === "key" && <Typography>{state.message}</Typography>}
 						</FormControl>
 					</CardContent>
 				</Card>
@@ -150,7 +155,7 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 				{/* Submission */}
 				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft" color="neutral">
 					<CardContent>
-						<Terms />
+						<Terms id={"terms"} />
 					</CardContent>
 					<CardActions>
 						<Checkbox sx={{ mx: "auto", flex: 1 }} label={"I agree to these terms"} onChange={updateAgreement}></Checkbox>

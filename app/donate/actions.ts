@@ -2,8 +2,9 @@
 import PlatformService from "@/lib/services/PlatformService";
 import DontationService from "@/lib/services/DonationService";
 import { z } from "zod";
-import { PlatformProps, ResponseProps } from "@/lib/definitions";
-export async function getAllPlatforms(): Promise<PlatformProps[]> {
+import { ResponseProps } from "@/lib/definitions";
+
+export async function getAllPlatforms() {
 	return await PlatformService.getAll();
 }
 

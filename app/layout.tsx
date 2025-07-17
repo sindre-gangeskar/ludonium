@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Comfortaa, Geist, Geist_Mono, Noto_Sans } from "next/font/google";
+import { Comfortaa, Geist, Geist_Mono, Noto_Sans, Noto_Sans_Display } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/theme/ThemeProvider";
 import { Container } from "@mui/joy";
@@ -23,10 +23,14 @@ const comfortaa = Comfortaa({
 });
 
 const notoSans = Noto_Sans({
-	variable: '--font-noto-sans',
-	subsets: ['latin']
-})
+	variable: "--font-noto-sans",
+	subsets: ["latin"],
+});
 
+const notoSansDisplay = Noto_Sans_Display({
+	variable: "--font-noto-sans-display",
+	subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
 	title: "Project Giveaway",
@@ -40,12 +44,12 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} ${notoSans.variable} antialiased`}>
+			<body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} ${notoSans.variable} ${notoSansDisplay.variable} antialiased`}>
 				<SessionProvider>
 					<ThemeProvider>
 						<Navbar />
 						<Container maxWidth={"xl"}>{children}</Container>
-						<Background style="ellipse" maskSize={80}/>
+						<Background style="ellipse" maskSize={80} />
 					</ThemeProvider>
 				</SessionProvider>
 			</body>
