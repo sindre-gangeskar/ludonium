@@ -1,5 +1,5 @@
 import { ColorPaletteProp, Theme } from "@mui/joy";
-import { PlatformProps } from "./definitions";
+import { PlatformProps, ResponseProps } from "./definitions";
 
 export function applyGradientColors(theme: Theme, mode: "dark" | "light" | "system" | undefined, color: ColorPaletteProp = "primary") {
 	if (mode === "dark") {
@@ -37,4 +37,24 @@ export function isKeyValid(platform: PlatformProps["name"], key: string): boolea
 		default:
 			return false;
 	}
+}
+export function parseClientPrismaError(error: unknown, tableName: string): { message: string; name: string } {
+	const name = capitalizeString(tableName);
+	if (error && typeof error == "object" && "code" in error && "name" in error && "message" in error) {
+		switch (error["code"]) {
+			case "P2002": {
+				error.name = `Duplicate${name}RecordEntryError`;
+				error.message = `${name} record already exists in the database`;
+				throw { status: "fail", statusCode: 409, errors: { key: error.message } } as ResponseProps;
+			}
+			default:
+				break;
+		}
+	}
+	throw error;
+}
+export function capitalizeString(string: string) {
+	const capitalized = string.slice(0, 1).toUpperCase();
+	const lowerCase = string.slice(1).toLowerCase();
+	return capitalized + lowerCase;
 }

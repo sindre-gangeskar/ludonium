@@ -5,7 +5,16 @@ import Link from "next/link";
 
 export default function NavCollapsedMenu({ locations, collapsed }: { locations: LocationProps[]; collapsed: boolean }) {
 	return (
-		<List sx={{ bottom: 0, width: "100%", height: collapsed ? 0 : "max-content", overflowY: "hidden", transition: "height 250ms ease", p: collapsed ? 0 : 2 }}>
+		<List
+			sx={{
+				bottom: 0,
+				width: "100%",
+				height: { xs: collapsed ? 0 : "max-content", md: 0 },
+				overflowY: "hidden",
+				transition: "height 250ms ease",
+				p: collapsed ? 0 : 2,
+				display: { xs: "inherit", md: "none" },
+			}}>
 			{locations.map(location => (
 				<ListItem key={location.name}>
 					<Button component={Link} href={location.href} variant="soft" sx={{ width: "100%" }}>

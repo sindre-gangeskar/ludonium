@@ -1,11 +1,11 @@
 import { Typography, List, ListItem, Box } from "@mui/joy";
 import { ColorPaletteProp } from "@mui/joy";
-export default function Terms({ className, id }: { className?: string; id?: string }) {
+export default function FormTerms({ className, id }: { className?: string; id?: string }) {
 	const termAgreementColor: ColorPaletteProp = "neutral";
 
 	return (
 		<Box id={id} className={className}>
-			<Typography color="secondary" level="title-lg" variant="plain" p={2}>
+			<Typography color="primary" level="title-lg" variant="plain" p={2}>
 				Please read the terms underneath <strong>thoroughly</strong> before submitting your key.
 			</Typography>
 			<List marker="disc">

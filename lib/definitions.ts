@@ -1,8 +1,6 @@
-import { ColorPaletteProp } from "@mui/joy/styles/types";
-
 export interface PlatformProps {
 	id?: number;
-	name: "steam" | "ea" | "gog" | "epic" | "ubisoft" | "switch" | "playstation" | "xbox";
+	name: string | "steam" | "ea" | "gog" | "epic" | "ubisoft" | "switch" | "playstation" | "xbox";
 	platformTypeId?: number;
 	platformType?: PlatformTypeProps | null;
 }
@@ -19,17 +17,9 @@ export interface DonationProps {
 	platform: PlatformProps["name"];
 }
 
-export interface Key {
+export interface KeyProps {
 	key: string;
 	discordId: string;
-}
-
-export interface BackgroundProps {
-	style?: "circle" | "ellipse";
-	gridSize?: 20 | 40 | 60 | 80;
-	color?: ColorPaletteProp;
-	maskSize?: 20 | 40 | 60 | 80 | 100;
-	dotSize?: number;
 }
 
 export interface GuildProps {
@@ -48,14 +38,17 @@ export interface LocationProps {
 	href: string;
 }
 
-export type StateProps = string;
+export type DonationFormErrorTypes = {
+	key?: string;
+	gameName?: string;
+};
 
-export interface ResponseProps {
+export type ResponseProps = {
 	status: "success" | "error" | "fail";
-	statusCode: 200 | 201 | 400 | 401 | 409 | 500;
+	statusCode: 200 | 201 | 400 | 401 | 404 | 409 | 500;
 	message?: string;
-	errorType?: StateProps;
+	errors?: DonationFormErrorTypes;
 	data?: unknown;
-}
+};
 
 export type PlatformTypes = "pc" | "console";

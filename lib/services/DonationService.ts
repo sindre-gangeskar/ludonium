@@ -1,6 +1,8 @@
 import { DonationProps, PlatformProps, ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
 import { isKeyValid } from "../utils";
+import KeyService from "./KeyService";
+
 export default class DontationService {
 	static async getDonations(discordId: string) {
 		try {
@@ -15,29 +17,55 @@ export default class DontationService {
 		}
 	}
 
-	static async createDonation(discordId: string, key: string, gameName: string, platformTypeId: number, platformId: number) {
+	static async createDonation(formdata: FormData) {
 		try {
-			const platform = await prisma.platform.findFirst({ where: { id: platformId } });
-			if (!platform) throw new Error("Failed to find platform with provided id");
+			const validated = await validateForm(formdata);
+			if (!validated.success) throw { status: "fail", statusCode: 400, errors: validated.errors } as ResponseProps;
 
-			if (!isKeyValid(platform.name as PlatformProps["name"], key)) {
-				const upperCase = platform.name[0].toUpperCase();
-				const lowercase = platform.name.slice(1, platform.name.length);
-				const name = upperCase + lowercase;
-				return {
-					status: "fail",
-					statusCode: 400,
-					message: `Invalid ${name} key format`,
-					errorType: "key",
-				} as ResponseProps;
-			}
+			const createdKey = await KeyService.create(validated.data.key);
+			await prisma.donation.create({
+				data: { keyId: createdKey.id, platformId: +validated.data.platformId, platformTypeId: +validated.data.platformTypeId, gameName: validated.data.gameName, discordId: validated.data.discordId },
+			});
 
-			const createdKey = await prisma.key.create({ data: { key: key.toLowerCase() } });
-			await prisma.donation.create({ data: { keyId: createdKey.id, platformId: +platformId, platformTypeId: +platformTypeId, gameName: gameName, discordId: discordId.toString() } });
 			return { status: "success", statusCode: 201, message: "Successfully created donation" } as ResponseProps;
 		} catch (error) {
 			console.error(error);
+			if (error && typeof error === "object" && "errors" in error) return error as ResponseProps;
 			return { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to create a donation" } as ResponseProps;
 		}
 	}
+}
+
+async function validateForm(formdata: FormData) {
+	const platform = await prisma.platform.findFirst({ where: { id: Number(formdata.get("platformId")) } });
+	if (!platform) throw new Error("Failed to retrieve platform by provided id");
+	const numberRegex = /^[0-9]+$/;
+	let accumulatedErrors: { [key: string]: string } = {};
+	const form = Object.fromEntries(formdata.entries());
+
+	const data: { gameName: string; platformId: string; platformTypeId: string; key: string; discordId: string } = {
+		gameName: form.gameName.toString(),
+		discordId: form.discordId.toString(),
+		key: form.key.toString(),
+		platformId: form.platformId.toString(),
+		platformTypeId: form.platformTypeId.toString(),
+	};
+
+	if (typeof data.discordId !== "string" || data.discordId === "") {
+		accumulatedErrors = { ...accumulatedErrors, discordId: "Discord ID must be a string and cannot be empty" };
+	}
+	if (!numberRegex.test(data.platformTypeId)) {
+		accumulatedErrors = { ...accumulatedErrors, platformTypeId: "platformTypeId is required and must be a number" };
+	}
+	if (!numberRegex.test(data.platformId)) {
+		accumulatedErrors = { ...accumulatedErrors, platformId: "platformId is required and must be a number" };
+	}
+	if (typeof data.gameName !== "string" || data.gameName.length < 3) {
+		accumulatedErrors = { ...accumulatedErrors, gameName: "Game Title must be a at least 3 characters long" };
+	}
+	if (data.key && !isKeyValid(platform.name as PlatformProps["name"], data.key.toString())) {
+		accumulatedErrors = { ...accumulatedErrors, key: `Invalid ${platform.name} key format` };
+	}
+	console.error(accumulatedErrors);
+	return Object.keys(accumulatedErrors).length > 0 ? { errors: accumulatedErrors, success: false, data: data } : { data, success: true };
 }

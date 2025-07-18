@@ -2,19 +2,27 @@
 import { PlatformProps, PlatformTypeProps, PlatformTypes } from "@/lib/definitions";
 import { Box, Button, Radio, Card, CardActions, CardContent, FormControl, Input, Typography, RadioGroup, Checkbox, FormLabel, Stack } from "@mui/joy";
 import { SxProps } from "@mui/joy/styles/types";
-import { useActionState, useState } from "react";
-import Terms from "./Terms";
+import { useActionState, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { submitDonation } from "@/app/donate/actions";
-import DonationSuccess from "./DonationSuccess";
+
+import FormTerms from "./FormTerms";
+import FormSuccess from "./FormSuccess";
+import FormInputError from "./FormInputError";
+import FormError from "./FormError";
+
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+
+import { ResponseProps } from "@/lib/definitions";
+
 export default function FormDisplay({ platforms, platformTypes }: { platforms: PlatformProps[]; platformTypes: PlatformTypeProps[] }) {
+	const { data } = useSession();
 	const [agreed, setAgreed] = useState<boolean>(false);
 	const [activePlatformType, setActivePlatformType] = useState<PlatformTypes>("pc");
 	const [activePlatform, setActivePlatform] = useState<PlatformProps>({ name: platforms[0]?.name, id: platforms[0]?.id });
-	const { data } = useSession();
 	const [state, dispatch, isPending] = useActionState(submitDonation, null);
+	const [formState, setFormState] = useState<ResponseProps | null>(null);
 	const consolePlatforms = platforms.filter(platform => platform?.platformType?.name === "console");
 	const pcPlatforms = platforms.filter(platform => platform?.platformType?.name === "pc");
 	const cardSx: SxProps = { borderRadius: "1.25rem" };
@@ -23,9 +31,11 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 		if (platformType === "pc") return pcPlatforms[0];
 		else return consolePlatforms[0];
 	};
-	const updateAgreement = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const updateAgreementState = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAgreed(e.target.checked);
 	};
+	const resetFormState = () => { setFormState(null); console.log('CLICK') };
+
 	useGSAP(() => {
 		const tl = gsap.timeline();
 
@@ -35,9 +45,15 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 		gsap.to(".input-card > *", { opacity: 1, filter: "blur(0px)", duration: 1.1, delay: 0.5, ease: "power4.out" });
 	});
 
+	useEffect(() => {
+		setFormState(state);
+	}, [state]);
+
+	if (formState?.status === "error") return <FormError />;
+
 	return platforms.length && platformTypes.length > 0 ? (
-		state?.status === "success" ? (
-			<DonationSuccess />
+		formState?.status === "success" ? (
+			<FormSuccess onClick={resetFormState} />
 		) : (
 			<Stack component={"form"} action={dispatch} rowGap={"column"} gap={2} sx={{ maxWidth: "sm", mx: "auto", my: 4 }}>
 				<Typography className="label" level="h1" textAlign={"center"}>
@@ -135,6 +151,7 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 								Game Title
 							</FormLabel>
 							<Input required color="secondary" name="gameName" placeholder="Enter the title of the game here" autoComplete="gameName"></Input>
+							{state?.errors?.gameName && <FormInputError>{state.errors.gameName}</FormInputError>}
 						</FormControl>
 					</CardContent>
 				</Card>
@@ -147,7 +164,7 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 								Game Key
 							</FormLabel>
 							<Input required color="secondary" name={"key"} placeholder={`Enter your ${activePlatform.name} key here...`}></Input>
-							{state?.status === "fail" && state?.errorType === "key" && <Typography>{state.message}</Typography>}
+							{state?.errors?.key && <FormInputError>{state.errors.key}</FormInputError>}
 						</FormControl>
 					</CardContent>
 				</Card>
@@ -155,11 +172,11 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 				{/* Submission */}
 				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft" color="neutral">
 					<CardContent>
-						<Terms id={"terms"} />
+						<FormTerms id={"terms"} />
 					</CardContent>
 					<CardActions>
-						<Checkbox sx={{ mx: "auto", flex: 1 }} label={"I agree to these terms"} onChange={updateAgreement}></Checkbox>
-						<Button loading={isPending} sx={{ flex: 1 }} type="submit" size="lg" disabled={!agreed} color="secondary">
+						<Checkbox sx={{ mx: "auto", flex: 1 }} label={"I agree to these terms"} onChange={updateAgreementState}></Checkbox>
+						<Button loading={isPending} sx={{ flex: 1 }} type="submit" size="lg" disabled={!agreed} color="primary">
 							Submit donation
 						</Button>
 					</CardActions>

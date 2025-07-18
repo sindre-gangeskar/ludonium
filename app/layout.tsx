@@ -49,7 +49,7 @@ export default function RootLayout({
 					<ThemeProvider>
 						<Navbar />
 						<Container maxWidth={"xl"}>{children}</Container>
-						<Background style="ellipse" maskSize={80} />
+						<Background />
 					</ThemeProvider>
 				</SessionProvider>
 			</body>

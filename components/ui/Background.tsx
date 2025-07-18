@@ -1,8 +1,7 @@
 "use client";
-import { BackgroundProps } from "@/lib/definitions";
 import { Box, useColorScheme } from "@mui/joy";
 import { applyGradientColors } from "@/lib/utils";
-export default function Background({ style = "circle", maskSize = 60 }: BackgroundProps) {
+export default function Background() {
 	const { mode } = useColorScheme();
 	return (
 		<Box id="background-wrapper" sx={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", zIndex: -1 }}>
@@ -12,7 +11,6 @@ export default function Background({ style = "circle", maskSize = 60 }: Backgrou
 					width: "100%",
 					height: "100%",
 					mx: "auto",
-					maskImage: `radial-gradient(${style} ellipse at center, rgba(0,0,0, 1) 0%, rgba(0,0,0,0) ${maskSize}%)`,
 					zIndex: -1,
 					transition: "250ms ease",
 					overflow: "hidden",
