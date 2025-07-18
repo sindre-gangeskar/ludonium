@@ -94,8 +94,9 @@ function generateColorVariables(color: ColorPaletteProp) {
 		softBg: `var(--joy-palette-${color}-900)`,
 		softHoverBg: `var(--joy-palette-${color}-800)`,
 		softActiveBg: `var(--joy-palette-${color}-500)`,
-		plainColor: `var(--joy-palette-${color}-300)`,
+		plainColor: `var(--joy-palette-${color}-200)`,
 		plainActiveBg: `var(--joy-palette-${color}-100)`,
+		plainHoverBg: `var(--joy-palette-${color}-700)`,
 		disabledBg: `var(--joy-palette-${color}-900)`,
 		solidDisabledColor: `var(--joy-palette-neutral-500)`,
 		solidDisabledBg: `var(--joy-palette-neutral-800)`,
@@ -111,8 +112,9 @@ function generateColorVariables(color: ColorPaletteProp) {
 		softHoverColor: `var(--joy-palette-${color}-50)`,
 		softBg: `var(--joy-palette-${color}-50)`,
 		softActiveBg: `var(--joy-palette-${color}-300)`,
-		softHoverBg: `var(--joy-palette-${color}-200)`,
+		softHoverBg: `var(--joy-palette-${color}-100)`,
 		plainColor: `var(--joy-palette-${color}-700)`,
+		plainHoverBg: `var(--joy-palette-${color}-50)`,
 		plainActiveBg: `var(--joy-palette-${color}-100)`,
 		disabledBg: `var(--joy-palette-${color}-50)`,
 		solidDisabledColor: `var(--joy-palette-neutral-400)`,
@@ -125,16 +127,16 @@ function getCustomColorRGBValues(color: ColorPaletteProp) {
 	switch (color) {
 		case "secondary": {
 			return {
-				50: "rgb(248, 243, 254)",
+				50: "rgb(232, 223, 244)",
 				100: "rgb(206, 179, 231)",
 				200: "rgb(170, 135, 205)",
-				300: "rgb(176, 134, 219)",
-				400: "rgb(160, 107, 213)",
-				500: "rgb(143, 95, 192)",
-				600: "rgb(140, 72, 208)",
-				700: "rgb(125, 65, 186)",
-				800: "rgb(68, 33, 103)",
-				900: "rgb(43, 25, 62)",
+				300: "rgb(144, 103, 184)",
+				400: "rgb(138, 87, 189)",
+				500: "rgb(125, 73, 176)",
+				600: "rgb(94, 44, 144)",
+				700: "rgb(76, 44, 109)",
+				800: "rgb(48, 26, 69)",
+				900: "rgb(29, 20, 39)",
 			};
 		}
 		default:

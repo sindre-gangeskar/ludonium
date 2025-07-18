@@ -6,17 +6,17 @@ export default function Login() {
 	const { status } = useSession();
 	return status === "unauthenticated" ? (
 		<form action={login}>
-			<Card variant="soft" color="neutral" size="lg" sx={{ width: "fit-content", mt: 5, maxWidth: "sm" }}>
-				<Typography level="title-sm">
+			<Card variant="plain" color="primary" size="md" sx={{ width: "fit-content", mt: 5, maxWidth: "sm", background: 'transparent' }}>
+				<Typography level="title-md">
 					In order to donate, logging in via your <strong>Discord</strong> account is necessary. <br /> {"Here's why:"}
 				</Typography>
 				<CardContent>
 					<List marker={"disc"}>
 						<ListItem>
-							<Typography level={"title-sm"}>Ensure you are a part of the Discord server.</Typography>
+							<Typography level={"title-md"}>Ensure you are a part of the Discord server.</Typography>
 						</ListItem>
 						<ListItem>
-							<Typography level={"title-sm"}>Keep track of your donations and update your unique role in the server after a set amount of donations have been made.</Typography>
+							<Typography level={"title-md"}>Keep track of your donations and update your unique role in the server after a set amount of donations have been made.</Typography>
 						</ListItem>
 					</List>
 				</CardContent>

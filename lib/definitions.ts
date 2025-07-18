@@ -5,13 +5,18 @@ export interface PlatformProps {
 	platformType?: PlatformTypeProps | null;
 }
 
+export interface RegionProps {
+	id?: number;
+	name: string;
+}
+
 export interface PlatformTypeProps {
 	id?: number;
 	name: string;
 }
 
 export interface DonationProps {
-	gameName: string;
+	region: { id: number; name: string };
 	discordId?: string;
 	platformType: PlatformTypeProps["name"];
 	platform: PlatformProps["name"];

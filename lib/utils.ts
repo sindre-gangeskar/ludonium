@@ -9,21 +9,26 @@ export function applyGradientColors(theme: Theme, mode: "dark" | "light" | "syst
 export function isKeyValid(platform: PlatformProps["name"], key: string): boolean {
 	const steamRegex =
 		/^([A-Z0-9]{5}[A-Z0-9]{5}[A-Z0-9]{5}|[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}|[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}|[A-Z0-9]{5}[A-Z0-9]{5}[A-Z0-9]{5}[A-Z0-9]{5}[A-Z0-9]{5})$/i;
+	const eaRegex = /^([A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4})$/i;
+	const ubisoftRegex = /^([A-Z0-9]{3}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}|[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4})$/i;
+	const epicRegex = /^([A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5})$/i;
+	const gogRegex = /^([A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5})$/i;
+	
 	switch (platform) {
 		case "steam": {
-			return steamRegex.test(key);
+			return steamRegex.test(key.trim());
 		}
 		case "gog": {
-			return true;
+			return gogRegex.test(key);
 		}
 		case "ea": {
-			return true;
+			return eaRegex.test(key);
 		}
 		case "ubisoft": {
-			return true;
+			return ubisoftRegex.test(key);
 		}
 		case "epic": {
-			return true;
+			return epicRegex.test(key);
 		}
 		case "playstation": {
 			return true;

@@ -1,5 +1,5 @@
 "use client";
-import { PlatformProps, PlatformTypeProps, PlatformTypes } from "@/lib/definitions";
+import { PlatformProps, PlatformTypeProps, PlatformTypes, RegionProps } from "@/lib/definitions";
 import { Box, Button, Radio, Card, CardActions, CardContent, FormControl, Input, Typography, RadioGroup, Checkbox, FormLabel, Stack } from "@mui/joy";
 import { SxProps } from "@mui/joy/styles/types";
 import { useActionState, useEffect, useState } from "react";
@@ -10,21 +10,26 @@ import FormTerms from "./FormTerms";
 import FormSuccess from "./FormSuccess";
 import FormInputError from "./FormInputError";
 import FormError from "./FormError";
+import Header from "../ui/Header";
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
 import { ResponseProps } from "@/lib/definitions";
+import FormKeyFormatGuide from "./FormKeyFormatGuide";
 
-export default function FormDisplay({ platforms, platformTypes }: { platforms: PlatformProps[]; platformTypes: PlatformTypeProps[] }) {
+export default function FormDisplay({ platforms, platformTypes, regions }: { platforms: PlatformProps[]; platformTypes: PlatformTypeProps[]; regions: RegionProps[] }) {
 	const { data } = useSession();
+
 	const [agreed, setAgreed] = useState<boolean>(false);
 	const [activePlatformType, setActivePlatformType] = useState<PlatformTypes>("pc");
-	const [activePlatform, setActivePlatform] = useState<PlatformProps>({ name: platforms[0]?.name, id: platforms[0]?.id });
+	const [ activePlatform, setActivePlatform ] = useState<PlatformProps>({ name: platforms[ 0 ]?.name, id: platforms[ 0 ]?.id });
 	const [state, dispatch, isPending] = useActionState(submitDonation, null);
 	const [formState, setFormState] = useState<ResponseProps | null>(null);
+
 	const consolePlatforms = platforms.filter(platform => platform?.platformType?.name === "console");
 	const pcPlatforms = platforms.filter(platform => platform?.platformType?.name === "pc");
+
 	const cardSx: SxProps = { borderRadius: "1.25rem" };
 
 	const getDefaultPlatform = (platformType: PlatformTypes) => {
@@ -34,15 +39,17 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 	const updateAgreementState = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAgreed(e.target.checked);
 	};
-	const resetFormState = () => { setFormState(null); console.log('CLICK') };
+	const resetFormState = () => {
+		setFormState(null);
+	};
 
 	useGSAP(() => {
 		const tl = gsap.timeline();
 
-		tl.set(".input-card > *", { opacity: 0, filter: "blur(16px)" });
-		tl.set(".input-card", { opacity: 0, x: 100 });
-		gsap.to(".input-card", { opacity: 1, x: 0, duration: 1, stagger: 0.2, ease: "power2.out" });
-		gsap.to(".input-card > *", { opacity: 1, filter: "blur(0px)", duration: 1.1, delay: 0.5, ease: "power4.out" });
+		tl.set(".input-card > *, .title > *", { opacity: 0, filter: "blur(12px)" });
+		tl.set(".input-card, .title > *", { opacity: 0, x: 100 });
+		gsap.to(".input-card, .title > *", { opacity: 1, x: 0, duration: 1.4, stagger: 0.2, ease: "power2.out" });
+		gsap.to(".input-card > *, .title > *", { opacity: 1, filter: "blur(0px)", duration: 1.1, delay: 0.1, ease: "power2.out", stagger: 0.2 });
 	});
 
 	useEffect(() => {
@@ -56,9 +63,8 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 			<FormSuccess onClick={resetFormState} />
 		) : (
 			<Stack component={"form"} action={dispatch} rowGap={"column"} gap={2} sx={{ maxWidth: "sm", mx: "auto", my: 4 }}>
-				<Typography className="label" level="h1" textAlign={"center"}>
-					Donate Game Submission
-				</Typography>
+				<Header className="title" title="Donate a game key" description="Submission form for donating a game key to the community" />
+
 				<input name="discordId" defaultValue={data?.user?.id} type="hidden"></input>
 				{/* Platform Type Selection */}
 				<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft">
@@ -148,10 +154,21 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 					<CardContent>
 						<FormControl>
 							<FormLabel required className="label">
-								Game Title
+								Region
 							</FormLabel>
-							<Input required color="secondary" name="gameName" placeholder="Enter the title of the game here" autoComplete="gameName"></Input>
-							{state?.errors?.gameName && <FormInputError>{state.errors.gameName}</FormInputError>}
+							<RadioGroup orientation="horizontal" defaultValue={platformTypes[0].id} sx={{ gap: 2, my: 2, justifyContent: "center" }}>
+								{regions.map(region => (
+									<Radio
+										size="lg"
+										color={"secondary"}
+										variant={"outlined"}
+										label={region.name}
+										value={region.id}
+										key={region.id}
+										name="regionId"
+										sx={{ textTransform: "uppercase", maxWidth: "fit-content" }}></Radio>
+								))}
+							</RadioGroup>
 						</FormControl>
 					</CardContent>
 				</Card>
@@ -166,6 +183,7 @@ export default function FormDisplay({ platforms, platformTypes }: { platforms: P
 							<Input required color="secondary" name={"key"} placeholder={`Enter your ${activePlatform.name} key here...`}></Input>
 							{state?.errors?.key && <FormInputError>{state.errors.key}</FormInputError>}
 						</FormControl>
+						<FormKeyFormatGuide platform={activePlatform.name} />
 					</CardContent>
 				</Card>
 

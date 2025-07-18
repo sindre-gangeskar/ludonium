@@ -6,8 +6,8 @@ import KeyService from "./KeyService";
 export default class DontationService {
 	static async getDonations(discordId: string) {
 		try {
-			return (await prisma.donation.findMany({ where: { discordId: discordId }, include: { platform: true, platformType: true } })).map(donation => ({
-				gameName: donation.gameName,
+			return (await prisma.donation.findMany({ where: { discordId: discordId }, include: { platform: true, platformType: true, region: true } })).map(donation => ({
+				region: { id: donation?.region?.id, name: donation?.region?.name },
 				platform: donation?.platform?.name,
 				platformType: donation?.platformType?.name,
 			})) as DonationProps[];
@@ -22,9 +22,9 @@ export default class DontationService {
 			const validated = await validateForm(formdata);
 			if (!validated.success) throw { status: "fail", statusCode: 400, errors: validated.errors } as ResponseProps;
 
-			const createdKey = await KeyService.create(validated.data.key);
+			const createdKey = await KeyService.create(validated.data.key, +validated.data.platformId);
 			await prisma.donation.create({
-				data: { keyId: createdKey.id, platformId: +validated.data.platformId, platformTypeId: +validated.data.platformTypeId, gameName: validated.data.gameName, discordId: validated.data.discordId },
+				data: { regionId: +validated.data.regionId, keyId: createdKey.id, platformId: +validated.data.platformId, platformTypeId: +validated.data.platformTypeId, discordId: validated.data.discordId },
 			});
 
 			return { status: "success", statusCode: 201, message: "Successfully created donation" } as ResponseProps;
@@ -43,8 +43,8 @@ async function validateForm(formdata: FormData) {
 	let accumulatedErrors: { [key: string]: string } = {};
 	const form = Object.fromEntries(formdata.entries());
 
-	const data: { gameName: string; platformId: string; platformTypeId: string; key: string; discordId: string } = {
-		gameName: form.gameName.toString(),
+	const data: { regionId: string; platformId: string; platformTypeId: string; key: string; discordId: string } = {
+		regionId: form.regionId.toString(),
 		discordId: form.discordId.toString(),
 		key: form.key.toString(),
 		platformId: form.platformId.toString(),
@@ -60,8 +60,8 @@ async function validateForm(formdata: FormData) {
 	if (!numberRegex.test(data.platformId)) {
 		accumulatedErrors = { ...accumulatedErrors, platformId: "platformId is required and must be a number" };
 	}
-	if (typeof data.gameName !== "string" || data.gameName.length < 3) {
-		accumulatedErrors = { ...accumulatedErrors, gameName: "Game Title must be a at least 3 characters long" };
+	if (!numberRegex.test(data.regionId)) {
+		accumulatedErrors = { ...accumulatedErrors, platformId: "platformId is required and must be a number" };
 	}
 	if (data.key && !isKeyValid(platform.name as PlatformProps["name"], data.key.toString())) {
 		accumulatedErrors = { ...accumulatedErrors, key: `Invalid ${platform.name} key format` };

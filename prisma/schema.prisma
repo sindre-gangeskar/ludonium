@@ -15,23 +15,36 @@ datasource db {
 }
 
 model Key {
-  id       Int       @id @default(autoincrement())
-  key      String    @unique
-  donation Donation?
+  id         Int       @id @default(autoincrement())
+  key        String
+  donationId Int
+  platformId Int
+  donation   Donation?
+  Platform   Platform? @relation(fields: [platformId], references: [id])
 
+  @@unique([key, platformId])
   @@map("keys")
 }
 
+model Region {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
+  donation Donation[]
+
+  @@map("regions")
+}
+
 model Donation {
-  id         Int       @id @default(autoincrement())
-  keyId      Int       @unique
-  gameName String
-  key        Key?      @relation(fields: [keyId], references: [id], onDelete: Cascade)
-  discordId  String
-  platformId Int
-  platform   Platform? @relation(fields: [platformId], references: [id])
+  id             Int           @id @default(autoincrement())
+  keyId          Int           @unique
+  key            Key?          @relation(fields: [keyId], references: [id], onDelete: Cascade)
+  discordId      String
+  platformId     Int
+  platform       Platform?     @relation(fields: [platformId], references: [id])
   platformTypeId Int
-  platformType PlatformType? @relation(fields: [platformTypeId], references: [id])
+  platformType   PlatformType? @relation(fields: [platformTypeId], references: [id])
+  regionId       Int
+  region         Region?       @relation(fields: [regionId], references: [id])
 
   @@map("donations")
 }
@@ -42,6 +55,7 @@ model Platform {
   platformTypeId Int
   platformType   PlatformType? @relation(fields: [platformTypeId], references: [id])
   donation       Donation[]
+  key            Key[]
 
   @@map("platforms")
 }

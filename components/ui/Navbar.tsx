@@ -53,8 +53,8 @@ export default function Navbar() {
 					{locations.map(item => (
 						<Button
 							size="lg"
-							variant={pathname === `${item.href}` ? "solid" : "soft"}
-							color={pathname === `${item.href}` ? "primary" : "neutral"}
+							variant={pathname === `${item.href}` ? "solid" : "plain"}
+							color={pathname === `${item.href}` ? "secondary" : "neutral"}
 							key={item.name}
 							component={Link}
 							href={item.href}
@@ -63,8 +63,9 @@ export default function Navbar() {
 						</Button>
 					))}
 				</Stack>
-				<Button
-					variant="plain"
+					<Button
+						color="secondary"
+					variant="soft"
 					size="lg"
 					sx={{ display: { md: "none", pointerEvents: { md: "none" } } }}
 					onClick={() => {

@@ -1,4 +1,4 @@
-import { PlatformProps, PlatformTypeProps } from "@/lib/definitions";
+import { PlatformProps, PlatformTypeProps, RegionProps } from "@/lib/definitions";
 import prisma from "@/lib/prisma/prisma";
 
 async function seed() {
@@ -13,8 +13,15 @@ async function seed() {
 			{ name: "xbox", platformTypeId: 2 },
 			{ name: "playstation", platformTypeId: 2 },
 		];
+
+		const regions: RegionProps[] = [{ name: "eu" }, { name: "us" }];
+
 		const platformTypes: PlatformTypeProps[] = [{ name: "pc" }, { name: "console" }];
 
+		for (const region of regions) {
+			await prisma.region.upsert({ where: { name: region.name }, create: { ...region }, update: {} });
+		}
+		
 		for (const type of platformTypes) {
 			await prisma.platformType.upsert({ where: { name: type.name }, create: { ...type }, update: {} });
 		}
