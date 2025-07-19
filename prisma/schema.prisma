@@ -17,12 +17,14 @@ datasource db {
 model Key {
   id         Int       @id @default(autoincrement())
   key        String
-  donationId Int
+  keyHash String
   platformId Int
+  authTag    String
+  iv         String
   donation   Donation?
   Platform   Platform? @relation(fields: [platformId], references: [id])
 
-  @@unique([key, platformId])
+  @@unique([keyHash, platformId])
   @@map("keys")
 }
 
@@ -45,6 +47,8 @@ model Donation {
   platformType   PlatformType? @relation(fields: [platformTypeId], references: [id])
   regionId       Int
   region         Region?       @relation(fields: [regionId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@map("donations")
 }

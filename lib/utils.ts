@@ -1,6 +1,6 @@
 import { ColorPaletteProp, Theme } from "@mui/joy";
 import { PlatformProps, ResponseProps } from "./definitions";
-
+import crypto from "crypto";
 export function applyGradientColors(theme: Theme, mode: "dark" | "light" | "system" | undefined, color: ColorPaletteProp = "primary") {
 	if (mode === "dark") {
 		return { center: theme.palette[color][700], edge: theme.palette[color][900] };
@@ -13,7 +13,7 @@ export function isKeyValid(platform: PlatformProps["name"], key: string): boolea
 	const ubisoftRegex = /^([A-Z0-9]{3}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}|[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4})$/i;
 	const epicRegex = /^([A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5})$/i;
 	const gogRegex = /^([A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5})$/i;
-	
+
 	switch (platform) {
 		case "steam": {
 			return steamRegex.test(key.trim());
@@ -62,4 +62,26 @@ export function capitalizeString(string: string) {
 	const capitalized = string.slice(0, 1).toUpperCase();
 	const lowerCase = string.slice(1).toLowerCase();
 	return capitalized + lowerCase;
+}
+export function encrypt(value: string) {
+	const secretToken = Buffer.from(process.env.ENCRYPT_SECRET || "", "hex");
+	if (!secretToken) throw new Error("Missing encryption secret");
+
+	const iv = crypto.randomBytes(12);
+	const cipher = crypto.createCipheriv("aes-128-ccm", secretToken, iv, { authTagLength: 16 });
+	const encrypted = Buffer.concat([cipher.update(value), cipher.final()]);
+	const authTag = cipher.getAuthTag();
+
+	return { encrypted, iv, authTag };
+}
+export function decrypt(encrypted: string, iv: string, authTag: string) {
+	const secretToken = Buffer.from(process.env.ENCRYPT_SECRET || "", "hex");
+	if (!secretToken) throw new Error("Missing encryption secret");
+	const decipher = crypto.createDecipheriv("aes-128-ccm", secretToken, Buffer.from(iv, "hex"), { authTagLength: 16 });
+	decipher.setAuthTag(Buffer.from(authTag, "hex"));
+	const decrypted = Buffer.concat([decipher.update(Buffer.from(encrypted, "hex")), decipher.final()]);
+	return decrypted.toString('utf-8');
+}
+export function generateKeyHash(key: string) {
+	return crypto.createHash('sha-256').update(key).digest('hex');
 }

@@ -10,9 +10,9 @@ export default function FormKeyFormatGuide({ platform }: { platform: PlatformPro
 	const ubisoftFormat: string[] = ["AAA-BBBB-CCCC-DDDD-EEEE", "AAAA-BBBB-CCCC-DDDD"];
 	const textSx: SxProps = { textAlign: "center", pointerEvents: 'none', userSelect: 'none' };
 	return (
-		<Card size="sm" color="secondary" variant="outlined" sx={{ my: 1 }}>
+		<Card size="sm" color="warning" variant="outlined" sx={{ my: 1, userSelect: 'none' }}>
 			<Typography color="warning" level="title-md" textAlign={"center"} sx={{ p: 0, m: 0 }}>
-				Accepted {platform} key formats
+				Valid {platform} key formats
 			</Typography>
 			<CardContent>
 				<Stack gap={1}>
@@ -29,7 +29,7 @@ export default function FormKeyFormatGuide({ platform }: { platform: PlatformPro
 
 function Guidelines({ arr, sx }: { arr: string[]; sx: SxProps }) {
 	return arr.map(format => (
-		<Typography level="title-sm" key={format} sx={{ ...sx }}>
+		<Typography variant="plain" color="warning" level="title-sm" key={format} sx={{ ...sx }}>
 			{format}
 		</Typography>
 	));

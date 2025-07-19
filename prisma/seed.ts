@@ -14,14 +14,14 @@ async function seed() {
 			{ name: "playstation", platformTypeId: 2 },
 		];
 
-		const regions: RegionProps[] = [{ name: "eu" }, { name: "us" }];
+		const regions: RegionProps[] = [{ name: "eu" }, { name: "us" }, { name: "latam" }, { name: "au" }, { name: "asia" }, { name: "ru" }, { name: "cis" }, { name: "global" }];
 
 		const platformTypes: PlatformTypeProps[] = [{ name: "pc" }, { name: "console" }];
 
 		for (const region of regions) {
 			await prisma.region.upsert({ where: { name: region.name }, create: { ...region }, update: {} });
 		}
-		
+
 		for (const type of platformTypes) {
 			await prisma.platformType.upsert({ where: { name: type.name }, create: { ...type }, update: {} });
 		}
