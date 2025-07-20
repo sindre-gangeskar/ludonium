@@ -44,6 +44,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
+			<head>
+				<link rel="icon" type="image/svg+xml" href="icon.svg"></link>
+			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} ${notoSans.variable} ${notoSansDisplay.variable} antialiased`}>
 				<SessionProvider>
 					<ThemeProvider>
