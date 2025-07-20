@@ -2,7 +2,8 @@
 
 # What is Ludonium?
 Ludonium is an application that takes in donated game keys, and give back to the Discord community through giveaways.  
-This project was made to prevent bots scraping keys from chat that are given away by community members of a Discord server.  
+
+This project was made to prevent bots from scraping game keys given away by community members on the server.  
 
 It prevents members of the community from also ghosting the user whom has given away the key.  
 (**Showing of appreciation is always nice to see**)
