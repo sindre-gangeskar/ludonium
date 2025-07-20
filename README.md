@@ -12,6 +12,11 @@ Once a user has donated a key, the key will be encrypted into the database and a
 People in the community will be able to participate by reacting to the message.  
 After a set amount of time has passed a winner will be selected and a DM will be sent to the winner by a bot with the key. 
 
+
+### Showcase
+![Home](.github/assets/presentation/home.png)
+![Donate](.github/assets/presentation/donate.png)
+
 ### Is it done? 
 No, I'm still actively working on this. It's not finished and it still has a way to go. Figuring things out as I develop.
 
