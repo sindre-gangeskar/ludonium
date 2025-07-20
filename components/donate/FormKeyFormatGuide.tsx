@@ -6,11 +6,14 @@ export default function FormKeyFormatGuide({ platform }: { platform: PlatformPro
 	const steamFormat: string[] = ["AAAAA-BBBBB-CCCCC-DDDDD-EEEEE", "AAAAA-BBBBB-CCCCC", "AAAAABBBBBCCCCCDDDDDEEEEE", "ABCDE12345XYZA3"];
 	const epicFormat: string[] = ["AAAAA-BBBBB-CCCCC-DDDDD-EEEEE"];
 	const gogFormat: string[] = ["AAAAA-BBBBB-CCCCC-DDDDD"];
+	const xboxFormat: string[] = ["AAAAA-BBBBB-CCCCC-DDDDD-EEEEE"];
+	const playstationFormat: string[] = ["AAAA-BBBB-CCCC"];
 	const eaFormat: string[] = ["AAAA-BBBB-CCCC-DDDD"];
 	const ubisoftFormat: string[] = ["AAA-BBBB-CCCC-DDDD-EEEE", "AAAA-BBBB-CCCC-DDDD"];
-	const textSx: SxProps = { textAlign: "center", pointerEvents: 'none', userSelect: 'none' };
+	const switchFormat: string[] = ["AAAA-BBBB-CCCC-DDDD"];
+	const textSx: SxProps = { textAlign: "center", pointerEvents: "none", userSelect: "none" };
 	return (
-		<Card size="sm" color="warning" variant="outlined" sx={{ my: 1, userSelect: 'none' }}>
+		<Card size="sm" color="warning" variant="outlined" sx={{ my: 1, userSelect: "none" }}>
 			<Typography color="warning" level="title-md" textAlign={"center"} sx={{ p: 0, m: 0 }}>
 				Valid {platform} key formats
 			</Typography>
@@ -21,6 +24,9 @@ export default function FormKeyFormatGuide({ platform }: { platform: PlatformPro
 					{platform === "ea" && <Guidelines arr={eaFormat} sx={textSx} />}
 					{platform === "epic" && <Guidelines arr={epicFormat} sx={textSx} />}
 					{platform === "ubisoft" && <Guidelines arr={ubisoftFormat} sx={textSx} />}
+					{platform === "switch" && <Guidelines arr={switchFormat} sx={textSx} />}
+					{platform === "xbox" && <Guidelines arr={xboxFormat} sx={textSx} />}
+					{platform === "playstation" && <Guidelines arr={playstationFormat} sx={textSx} />}
 				</Stack>
 			</CardContent>
 		</Card>

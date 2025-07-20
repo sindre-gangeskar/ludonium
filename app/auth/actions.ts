@@ -6,5 +6,5 @@ export async function login() {
 }
 
 export async function logout() {
-  return await signOut();
+	return await signOut();
 }

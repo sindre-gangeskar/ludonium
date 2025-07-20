@@ -23,6 +23,8 @@ export default class DontationService {
 			if (!validated.success) throw { status: "fail", statusCode: 400, errors: validated.errors } as ResponseProps;
 
 			const createdKey = await KeyService.create(validated.data.key, +validated.data.platformId);
+			if (!("key" in createdKey)) throw createdKey;
+			
 			await prisma.donation.create({
 				data: { regionId: +validated.data.regionId, keyId: createdKey.id, platformId: +validated.data.platformId, platformTypeId: +validated.data.platformTypeId, discordId: validated.data.discordId },
 			});

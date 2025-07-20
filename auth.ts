@@ -10,7 +10,7 @@ declare module "next-auth" {
 		guild: { id: string; name: string; icon?: string };
 	}
 }
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
 	providers: [
 		Discord({
 			authorization: { params: { scope: "identify guilds" } },
@@ -21,20 +21,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			if (account && account.providerAccountId) {
 				token.userId = account?.providerAccountId;
 			}
+			if (account?.access_token) {
+				token.access_token = account.access_token;
+			}
+
+			if (account && account.access_token) {
+				const data = await fetch("https://discord.com/api/users/@me/guilds", { headers: { Authorization: `Bearer ${account.access_token}` } });
+				const guilds = await data.json();
+				if (Array.isArray(guilds)) token.isMemberOfGuild = guilds.some((guild: GuildProps) => guild.id === process.env.DISCORD_GUILD_ID);
+			}
+
 			return token;
 		},
 
 		async session({ session, token }) {
-			const data = await fetch("https://discord.com/api/users/@me/guilds", { headers: { Authorization: `Bearer ${token.access_token}` } });
-			const guilds = await data.json();
+			if (token.userId) session.user.id = String(token.userId);
 
-			if (Array.isArray(guilds)) {
-				session.isMemberOfGuild = guilds.some((guild: GuildProps) => guild.id === process.env.DISCORD_SERVER_ID);
-			}
-			
-			if (token.userId) {
-				session.user.id = String(token.userId);
-			}
+			session.isMemberOfGuild = Boolean(token.isMemberOfGuild);
 			return session;
 		},
 	},

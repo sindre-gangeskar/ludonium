@@ -1,5 +1,8 @@
-import { Typography } from "@mui/joy";
-
+import ServerInfo from "@/components/community/ServerInfo";
 export default function Page() {
-  return (<Typography>Community Page</Typography>)
+	return (
+		<>
+			<ServerInfo />
+		</>
+	);
 }

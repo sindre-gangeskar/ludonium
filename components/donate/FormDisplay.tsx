@@ -43,6 +43,8 @@ export default function FormDisplay({ platforms, platformTypes, regions }: { pla
 	const resetFormState = () => {
 		if (formRef.current) formRef.current.reset();
 		setAgreed(false);
+		setActivePlatformType("pc");
+		setActivePlatform({ name: platforms[0].name, id: platforms[0].id });
 		setFormState(null);
 	};
 
@@ -145,9 +147,7 @@ export default function FormDisplay({ platforms, platformTypes, regions }: { pla
 					<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft">
 						<CardContent>
 							<FormControl>
-								<FormLabel className="label">
-									Select Region
-								</FormLabel>
+								<FormLabel className="label">Select Region</FormLabel>
 								<Box>
 									<RadioGroup orientation="horizontal" defaultValue={regions[0].id} sx={{ ...radioGroupSx }}>
 										{regions.map(region => (
@@ -163,7 +163,7 @@ export default function FormDisplay({ platforms, platformTypes, regions }: { pla
 													mx: "auto",
 													minWidth: "150px",
 													textAlign: "center",
-													textTransform: 'uppercase'
+													textTransform: "uppercase",
 												}}></Radio>
 										))}
 									</RadioGroup>
@@ -180,7 +180,7 @@ export default function FormDisplay({ platforms, platformTypes, regions }: { pla
 									Game Key
 								</FormLabel>
 								<Input required color="secondary" name={"key"} placeholder={`Enter your ${activePlatform.name} key here...`}></Input>
-								{state?.errors?.key && <FormInputError>{state.errors.key}</FormInputError>}
+								{state?.errors && "key" in state?.errors && <FormInputError>{state.errors.key}</FormInputError>}
 							</FormControl>
 							<FormKeyFormatGuide platform={activePlatform.name} />
 						</CardContent>

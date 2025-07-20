@@ -1,6 +1,10 @@
 import { ColorPaletteProp, Theme } from "@mui/joy";
 import { PlatformProps, ResponseProps } from "./definitions";
 import crypto from "crypto";
+
+const secretToken = Buffer.from(process.env.ENCRYPT_SECRET || "", "hex");
+if (!secretToken) throw new Error("Missing encryption secret");
+
 export function applyGradientColors(theme: Theme, mode: "dark" | "light" | "system" | undefined, color: ColorPaletteProp = "primary") {
 	if (mode === "dark") {
 		return { center: theme.palette[color][700], edge: theme.palette[color][900] };
@@ -13,7 +17,9 @@ export function isKeyValid(platform: PlatformProps["name"], key: string): boolea
 	const ubisoftRegex = /^([A-Z0-9]{3}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}|[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4})$/i;
 	const epicRegex = /^([A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5})$/i;
 	const gogRegex = /^([A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5})$/i;
-
+	const xboxRegex = /^([A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5})$/i;
+	const switchRegex = /^([A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4})$/i;
+	const playstationRegex = /^([A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4})$/i;
 	switch (platform) {
 		case "steam": {
 			return steamRegex.test(key.trim());
@@ -31,13 +37,13 @@ export function isKeyValid(platform: PlatformProps["name"], key: string): boolea
 			return epicRegex.test(key);
 		}
 		case "playstation": {
-			return true;
+			return playstationRegex.test(key);
 		}
 		case "switch": {
-			return true;
+			return switchRegex.test(key);
 		}
 		case "xbox": {
-			return true;
+			return xboxRegex.test(key);
 		}
 		default:
 			return false;
@@ -64,9 +70,6 @@ export function capitalizeString(string: string) {
 	return capitalized + lowerCase;
 }
 export function encrypt(value: string) {
-	const secretToken = Buffer.from(process.env.ENCRYPT_SECRET || "", "hex");
-	if (!secretToken) throw new Error("Missing encryption secret");
-
 	const iv = crypto.randomBytes(12);
 	const cipher = crypto.createCipheriv("aes-128-ccm", secretToken, iv, { authTagLength: 16 });
 	const encrypted = Buffer.concat([cipher.update(value), cipher.final()]);
@@ -75,13 +78,11 @@ export function encrypt(value: string) {
 	return { encrypted, iv, authTag };
 }
 export function decrypt(encrypted: string, iv: string, authTag: string) {
-	const secretToken = Buffer.from(process.env.ENCRYPT_SECRET || "", "hex");
-	if (!secretToken) throw new Error("Missing encryption secret");
 	const decipher = crypto.createDecipheriv("aes-128-ccm", secretToken, Buffer.from(iv, "hex"), { authTagLength: 16 });
 	decipher.setAuthTag(Buffer.from(authTag, "hex"));
 	const decrypted = Buffer.concat([decipher.update(Buffer.from(encrypted, "hex")), decipher.final()]);
-	return decrypted.toString('utf-8');
+	return decrypted.toString("utf-8");
 }
 export function generateKeyHash(key: string) {
-	return crypto.createHash('sha-256').update(key).digest('hex');
+	return crypto.createHash("sha-256").update(key).digest("hex");
 }
