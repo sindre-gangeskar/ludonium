@@ -33,8 +33,8 @@ const notoSansDisplay = Noto_Sans_Display({
 });
 
 export const metadata: Metadata = {
-	title: "Project Giveaway",
-	description: "Giveaway application that gives away donated game keys",
+	title: "Ludonium",
+	description: "A giveaway system utilizing donated game keys for giving back to the community",
 };
 
 export default function RootLayout({
