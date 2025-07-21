@@ -22,7 +22,7 @@ model Key {
   authTag    String
   iv         String
   donation   Donation?
-  Platform   Platform? @relation(fields: [platformId], references: [id])
+  Platform   Platform @relation(fields: [platformId], references: [id]) 
 
   @@unique([keyHash, platformId])
   @@map("keys")
@@ -39,10 +39,10 @@ model Region {
 model Donation {
   id             Int           @id @default(autoincrement())
   keyId          Int           @unique
-  key            Key?          @relation(fields: [keyId], references: [id], onDelete: Cascade)
+  key            Key          @relation(fields: [keyId], references: [id], onDelete: Cascade)
   discordId      String
   platformId     Int
-  platform       Platform?     @relation(fields: [platformId], references: [id])
+  platform       Platform     @relation(fields: [platformId], references: [id])
   platformTypeId Int
   platformType   PlatformType? @relation(fields: [platformTypeId], references: [id])
   regionId       Int

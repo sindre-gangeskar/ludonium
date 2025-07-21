@@ -20,6 +20,7 @@ export function isKeyValid(platform: PlatformProps["name"], key: string): boolea
 	const xboxRegex = /^([A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5})$/i;
 	const switchRegex = /^([A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4})$/i;
 	const playstationRegex = /^([A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4})$/i;
+
 	switch (platform) {
 		case "steam": {
 			return steamRegex.test(key.trim());
@@ -55,7 +56,7 @@ export function parseClientPrismaError(error: unknown, tableName: string): { mes
 		switch (error["code"]) {
 			case "P2002": {
 				error.name = `Duplicate${name}RecordEntryError`;
-				error.message = `${name} record already exists in the database`;
+				error.message = `${name} already exists in the database`;
 				throw { status: "fail", statusCode: 409, errors: { key: error.message } } as ResponseProps;
 			}
 			default:

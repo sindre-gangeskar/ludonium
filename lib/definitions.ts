@@ -63,6 +63,8 @@ export interface DiscordEmbedProps {
 	title: string;
 	description?: string;
 	color?: number;
+	thumbnail?: DiscordMediaProps;
+	image?: DiscordMediaProps;
 	fields?: { name: string; value: string; inline: boolean }[];
 }
 
@@ -72,9 +74,13 @@ export interface DiscordMessageProps {
 	recipient_id?: string;
 }
 
-export type DiscordAPIRequest =
-	| { intent: "channel"; channelId: string; body: DiscordMessageProps }
-	| { intent: "guild"; guildId: string }
-	| { intent: "create-dm-channel"; recipient_id: string; };
+interface DiscordMediaProps {
+	url: string;
+	height?: number;
+	width?: number;
+	proxy_url?: string;
+}
+
+export type DiscordAPIRequest = { intent: "channel"; channelId: string; body: DiscordMessageProps } | { intent: "guild"; guildId: string } | { intent: "create-dm-channel"; recipient_id: string };
 
 export type PlatformTypes = "pc" | "console";
