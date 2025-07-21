@@ -1,11 +1,9 @@
 ![Ludonium Icon](.github/assets/Logo.svg)
 
 # What is Ludonium?
-Ludonium is an application that takes in donated game keys, and give back to the Discord community through giveaways.  
+Ludonium is an application that takes in donated game keys from discord members of a server, and initiates a giveaway back to same discord server community.  
 
-This project was made to prevent bots from scraping game keys given away by community members on the server.  
-
-It prevents members of the community from also ghosting the user whom has given away the key.  
+It prevents bot scraping and members of the community from also ghosting the user whom has given away the key.  
 (**Showing of appreciation is always nice to see**)
 
 ## How does it work?
@@ -19,7 +17,7 @@ After a set amount of time has passed a winner will be selected and a DM will be
 ![Donate](.github/assets/presentation/donate.png)
 
 ### Is it done? 
-No, I'm still actively working on this. It's not finished and it still has a way to go. Figuring things out as I develop.
+No, I'm still actively working on this in my spare time as a passion project. 
 
 #### Setting it up
 I'll fill this in once the project is close to being fully functional.
