@@ -47,10 +47,34 @@ model Donation {
   platformType   PlatformType? @relation(fields: [platformTypeId], references: [id])
   regionId       Int
   region         Region?       @relation(fields: [regionId], references: [id])
+  giveawayId Int? @unique
+  giveaway Giveaway?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
   @@map("donations")
+}
+
+model Giveaway{
+  id Int @id @default(autoincrement())
+  statusId Int
+  donationId Int @unique
+  donation Donation @relation(fields: [donationId], references: [id])
+  status Status @relation(fields: [statusId], references: [id])
+  winnerDiscordId String
+  duration DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("giveaways")
+}
+
+model Status {
+  id Int @id @default(autoincrement())
+  name String @unique
+  giveaway Giveaway[]
+
+  @@map("statuses")
 }
 
 model Platform {

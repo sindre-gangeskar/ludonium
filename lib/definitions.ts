@@ -10,6 +10,11 @@ export interface RegionProps {
 	name: string;
 }
 
+export interface StatusProps {
+	id?: number;
+	name: string
+}
+
 export interface PlatformTypeProps {
 	id?: number;
 	name: string;
