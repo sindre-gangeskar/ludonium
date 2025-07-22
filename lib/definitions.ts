@@ -41,7 +41,10 @@ export interface GuildProps {
 export interface SessionProps {
 	isMemberOfGuild: boolean;
 	guild: { name: string; id: string; icon?: string };
+	status?: "authenticated" | "loading" | "unauthenticated"
 }
+
+
 
 export interface LocationProps {
 	name: string;

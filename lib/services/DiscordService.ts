@@ -36,4 +36,12 @@ export default class DiscordService {
 			return { status: "error", statusCode: 500, errors: { generic: "An in internal server error has occurred while creating giveaway" } } as ResponseProps;
 		}
 	}
+	static async getRoles() {
+		try {
+			
+		} catch (error) {
+			console.error(error);
+			return {status: "error", statusCode: 500, errors: {generic: 'An internal server error has occurred while retrieving roles'}} as ResponseProps
+		}
+	}
 }

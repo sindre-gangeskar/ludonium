@@ -147,7 +147,7 @@ export default function FormDisplay({ platforms, platformTypes, regions }: { pla
 					<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft">
 						<CardContent>
 							<FormControl>
-								<FormLabel className="label">Select Region</FormLabel>
+								<Typography level="title-sm">Select Region</Typography>
 								<Box>
 									<RadioGroup orientation="horizontal" defaultValue={regions[0].id} sx={{ ...radioGroupSx }}>
 										{regions.map(region => (
