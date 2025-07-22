@@ -3,7 +3,6 @@ import { Client, GatewayIntentBits, Partials } from "discord.js";
 const token = process.env.DISCORD_BOT_TOKEN;
 if (!token) throw new Error('Missing Discord Bot Token environment variable');
 
-
 export default function DiscordBot() {
 	const client = new Client({
 		intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessageReactions],

@@ -21,10 +21,10 @@ export interface PlatformTypeProps {
 }
 
 export interface DonationProps {
-	region: { id: number; name: string };
+	region: RegionProps;
 	discordId?: string;
 	platformType: PlatformTypeProps["name"];
-	platform: PlatformProps["name"];
+	platform: PlatformProps[ "name" ];
 }
 
 export interface KeyProps {

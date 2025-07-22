@@ -21,9 +21,9 @@ export default function ServerInfo() {
 
 	return (
 	<Stack id="content" maxWidth={"lg"} mt={5} sx={{ mx: "auto" }}>
-		<Header title={data.name} />
+		<Header title={data?.name ?? "N/A"} />
 		<Stack gap={3} direction={"column"} width={"fit-content"} sx={{ mx: "auto", alignItems: "center" }}>
-			<Avatar sx={{ width: 120, height: 120, aspectRatio: 1 / 1, mx: "auto" }} size="lg" src={data.icon}></Avatar>
+			<Avatar sx={{ width: 120, height: 120, aspectRatio: 1 / 1, mx: "auto" }} size="lg" src={data?.iconURL ?? ''}></Avatar>
 			<MemberStatus />
 			{!discordData?.isMemberOfGuild && status === "authenticated" && <JoinServer />}
 		</Stack>
@@ -32,7 +32,7 @@ export default function ServerInfo() {
 				<Typography level="h2" color="secondary">
 					Description
 				</Typography>
-				<Typography level="title-md">{data.description}</Typography>
+				<Typography level="title-md">{data?.description ?? 'N/A'}</Typography>
 			</Box>
 			</Stack>
 			

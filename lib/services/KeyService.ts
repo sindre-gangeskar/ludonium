@@ -14,7 +14,7 @@ export default class KeyService {
 			return { status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while submitting key" } } as ResponseProps;
 		}
 	}
-	static async getKey(id: number) {
+	static async getById(id: number) {
 		try {
 			return await prisma.key.findFirst({ where: { id: id }, include: {Platform: true} });
 		} catch (error) {
@@ -23,7 +23,6 @@ export default class KeyService {
 			return { status: "error", statusCode: 500, errors: { generic: message } } as ResponseProps;
 		}
 	}
-
 	static async getAll() {
 		try {
 			return await prisma.key.findMany({ include: { Platform: true } });

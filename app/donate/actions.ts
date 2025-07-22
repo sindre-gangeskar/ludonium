@@ -13,5 +13,5 @@ export async function getAllRegions() {
 }
 
 export async function submitDonation(_state: ResponseProps | null, formdata: FormData) {
-	return await DontationService.createDonation(formdata);
+	return await DontationService.create(formdata);
 }

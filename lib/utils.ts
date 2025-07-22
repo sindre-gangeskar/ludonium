@@ -87,3 +87,13 @@ export function decrypt(encrypted: string, iv: string, authTag: string) {
 export function generateKeyHash(key: string) {
 	return crypto.createHash("sha-256").update(key).digest("hex");
 }
+export function getGiveawayDurationInDateTime(days: number) {
+	const time = new Date();
+	const duration = 1000 * 60 * 60 * 24 * days;
+	const deadline = new Date(time.getTime() + duration);
+	return deadline;
+}
+
+export function getColorFromHexToInt(hex: string) {
+	return parseInt(hex.replace("#", ""), 16);
+}

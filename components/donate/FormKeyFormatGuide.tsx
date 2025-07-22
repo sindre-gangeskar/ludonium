@@ -5,7 +5,7 @@ import { SxProps } from "@mui/joy/styles/types";
 export default function FormKeyFormatGuide({ platform }: { platform: PlatformProps["name"] }) {
 	const steamFormat: string[] = ["AAAAA-BBBBB-CCCCC-DDDDD-EEEEE", "AAAAA-BBBBB-CCCCC", "AAAAABBBBBCCCCCDDDDDEEEEE", "ABCDE12345XYZA3"];
 	const epicFormat: string[] = ["AAAAA-BBBBB-CCCCC-DDDDD-EEEEE"];
-	const gogFormat: string[] = ["AAAAA-BBBBB-CCCCC-DDDDD"];
+	const gogFormat: string[] = ["AAAAA-BBBBB-CCCCC-DDDDD-EEEEE"];
 	const xboxFormat: string[] = ["AAAAA-BBBBB-CCCCC-DDDDD-EEEEE"];
 	const playstationFormat: string[] = ["AAAA-BBBB-CCCC"];
 	const eaFormat: string[] = ["AAAA-BBBB-CCCC-DDDD"];

@@ -1,10 +1,11 @@
 import { DonationProps, PlatformProps, ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
 import { isKeyValid } from "../utils";
+import DiscordService from "./DiscordService";
 import KeyService from "./KeyService";
 
 export default class DontationService {
-	static async getDonations(discordId: string) {
+	static async getAll(discordId: string) {
 		try {
 			return (await prisma.donation.findMany({ where: { discordId: discordId }, include: { platform: true, platformType: true, region: true } })).map(donation => ({
 				region: { id: donation?.region?.id, name: donation?.region?.name },
@@ -16,24 +17,31 @@ export default class DontationService {
 			return { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to get donations" } as ResponseProps;
 		}
 	}
-
-	static async createDonation(formdata: FormData) {
+	static async create(formdata: FormData) {
 		try {
 			const validated = await validateForm(formdata);
 			if (!validated.success) throw { status: "fail", statusCode: 400, errors: validated.errors } as ResponseProps;
 
 			const createdKey = await KeyService.create(validated.data.key, +validated.data.platformId);
 			if (!("key" in createdKey)) throw createdKey;
-			
-			await prisma.donation.create({
+
+			const donation = await prisma.donation.create({
 				data: { regionId: +validated.data.regionId, keyId: createdKey.id, platformId: +validated.data.platformId, platformTypeId: +validated.data.platformTypeId, discordId: validated.data.discordId },
 			});
 
+			await DiscordService.createGiveaway(donation.id);
 			return { status: "success", statusCode: 201, message: "Successfully created donation" } as ResponseProps;
 		} catch (error) {
 			console.error(error);
 			if (error && typeof error === "object" && "errors" in error) return error as ResponseProps;
 			return { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to create a donation" } as ResponseProps;
+		}
+	}
+	static async getById(donationId: number) {
+		try {
+			return await prisma.donation.findFirstOrThrow({ where: { id: donationId }, include: { key: true, platform: true, region: true } });
+		} catch (error) {
+			console.error(error);
 		}
 	}
 }
