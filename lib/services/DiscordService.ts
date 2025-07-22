@@ -1,12 +1,11 @@
 import { DiscordMessageProps, DiscordEmbedProps, ResponseProps, DiscordAPIRequest } from "../definitions";
-import { capitalizeString, decrypt } from "../utils";
-import KeyService from "./KeyService";
 
 const discordApiUrl = process.env.DISCORD_API_URL;
 const guildId = process.env.DISCORD_GUILD_ID;
 const token = process.env.DISCORD_BOT_TOKEN;
 const giveawayChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_ID;
 const discordId = process.env.DISCORD_USER_ID;
+const discordServerURL = process.env.DISCORD_SERVER_URL;
 
 if (!token) throw new Error("Missing Discord Bot Token in environment variables");
 if (!giveawayChannelId) throw new Error("Missing Giveaway Channel ID in environment variables");
@@ -16,33 +15,16 @@ if (!guildId) throw new Error("Missing Guild ID in enironment variables");
 export default class DiscordService {
 	static async test() {
 		try {
-			const embed: DiscordEmbedProps = { title: "Test Giveaway Title", description: `Test Giveaway Description`, color: getColorFromHexToInt("#ffff92") };
-			const channelMessageBody: DiscordMessageProps = { embeds: [{ title: "This is a channel message", description: "Testing channel message!" }] };
-			let dmBody: DiscordMessageProps = { embeds: [embed], recipient_id: discordId };
+			const bodyEmbed: DiscordEmbedProps = { title: "Test Giveaway Title", description: `Test Giveaway Description`, color: getColorFromHexToInt("#ffff92") };
+			const body: DiscordMessageProps = { embeds: [bodyEmbed] };
 
-			/* TEST KEY RETRIEVAL AND DECYRPTION */
-			const key = await KeyService.getKey(1);
-			if (key && "key" in key) {
-				const decrypted = decrypt(key.key, key.iv, key.authTag);
-				dmBody = {
-	embeds: [
-		embed,
-		{
-			title: "Congratulations!",
-			description: `You won a donated game key!`,
-			color: getColorFromHexToInt('#fff700'),
-			image: { url: "https://cdn.discordapp.com/icons/1396186371768582234/62b136cbeb310324a9aa1930c69643fd" },
-			fields: [
-				{ name: "Platform", value: capitalizeString(key.Platform.name), inline: false },
-				{ name: "Key", value: decrypted, inline: false },
-			],
-		},
-	],
-};
-			}
-			await this.sendChannelMessage(channelMessageBody);
-			await this.sendDirectMessage(dmBody);
-			console.info("Successfully executed test function");
+			await fetch(`${discordServerURL}/create-giveaway`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(body),
+			});
 			return { status: "success", statusCode: 200, message: "Successfully sent Discord Message" } as ResponseProps;
 		} catch (error) {
 			console.error(error);
@@ -85,7 +67,6 @@ export default class DiscordService {
 		}
 	}
 }
-
 async function fetchToDiscordAPI(req: DiscordAPIRequest) {
 	let response;
 	switch (req.intent) {
@@ -113,7 +94,6 @@ async function fetchToDiscordAPI(req: DiscordAPIRequest) {
 	if (!response || !response.ok) throw new Error("Failed to fetch to Discord API");
 	return response;
 }
-
 function getColorFromHexToInt(hex: string) {
 	return parseInt(hex.replace("#", ""), 16);
 }
