@@ -6,18 +6,12 @@ import { useGSAP } from "@gsap/react";
 import MemberStatus from "./MemberStatus";
 import JoinServer from "./JoinServer";
 import { pingDiscordChannel } from "@/app/community/actions";
-import { SessionProps } from "@/lib/definitions";
-export default function ServerDisplay({
-	discordData,
-	sessionData,
-	status,
-}: {
-	discordData: { name: string; description: string; iconURL: string };
-	sessionData: SessionProps;
-	status: SessionProps["status"]
-}) {
-
-  useGSAP(() => {
+import useDiscord from "@/hooks/useDiscord";
+import { useSession } from "next-auth/react";
+export default function ServerDisplay() {
+	const { data: discordData } = useDiscord();
+	const { data: sessionData } = useSession();
+	useGSAP(() => {
 		gsap.set("#content > *, #content-box *", { opacity: 0, x: -150, filter: "blur(16px)" });
 		gsap.to("#content > *, #content-box *", { opacity: 1, x: 0, duration: 1.5, stagger: 0.2, filter: "blur(0px)", ease: "power4.out" });
 	}, []);
