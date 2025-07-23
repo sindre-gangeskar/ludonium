@@ -17,12 +17,12 @@ datasource db {
 model Key {
   id         Int       @id @default(autoincrement())
   key        String
-  keyHash String
+  keyHash    String
   platformId Int
   authTag    String
   iv         String
   donation   Donation?
-  Platform   Platform @relation(fields: [platformId], references: [id]) 
+  Platform   Platform  @relation(fields: [platformId], references: [id])
 
   @@unique([keyHash, platformId])
   @@map("keys")
@@ -39,40 +39,52 @@ model Region {
 model Donation {
   id             Int           @id @default(autoincrement())
   keyId          Int           @unique
-  key            Key          @relation(fields: [keyId], references: [id], onDelete: Cascade)
+  key            Key           @relation(fields: [keyId], references: [id], onDelete: Cascade)
   discordId      String
   platformId     Int
-  platform       Platform     @relation(fields: [platformId], references: [id])
+  platform       Platform      @relation(fields: [platformId], references: [id])
   platformTypeId Int
   platformType   PlatformType? @relation(fields: [platformTypeId], references: [id])
   regionId       Int
-  region         Region      @relation(fields: [regionId], references: [id])
-  giveawayId Int? @unique
-  giveaway Giveaway?
+  region         Region        @relation(fields: [regionId], references: [id])
+  giveawayId     Int?          @unique
+  giveaway       Giveaway?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
   @@map("donations")
 }
 
-model Giveaway{
-  id Int @id @default(autoincrement())
-  statusId Int
-  donationId Int @unique
-  donation Donation @relation(fields: [donationId], references: [id])
-  status Status @relation(fields: [statusId], references: [id])
-  messageId String?
+model Giveaway {
+  id              Int           @id @default(autoincrement())
+  statusId        Int
+  donationId      Int           @unique
+  donation        Donation      @relation(fields: [donationId], references: [id])
+  status          Status        @relation(fields: [statusId], references: [id])
+  messageId       String?
   winnerDiscordId String?
-  duration DateTime
+  duration        DateTime
+  participantId   Int?
+  participant     Participant[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   @@map("giveaways")
 }
 
+model Participant {
+  id         Int      @id @default(autoincrement())
+  discordId  String
+  giveawayId Int      
+  Giveaway   Giveaway @relation(fields: [giveawayId], references: [id])
+
+  @@unique([discordId, giveawayId])
+  @@map("participants")
+}
+
 model Status {
-  id Int @id @default(autoincrement())
-  name String @unique
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
   giveaway Giveaway[]
 
   @@map("statuses")
