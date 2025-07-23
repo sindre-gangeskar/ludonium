@@ -59,6 +59,11 @@ export function parseClientPrismaError(error: unknown, tableName: string): { mes
 				error.message = `${name} already exists in the database`;
 				throw { status: "fail", statusCode: 409, errors: { key: error.message } } as ResponseProps;
 			}
+			case "P2025": {
+				error.name = `Record${name}NotFoundError`;
+				error.message = `Failed to find ${name} record`;
+				throw { status: "fail", statusCode: 404, errors: { key: error.message } } as ResponseProps;
+			}
 			default:
 				break;
 		}
@@ -93,7 +98,10 @@ export function getGiveawayDurationInDateTime(days: number) {
 	const deadline = new Date(time.getTime() + duration);
 	return deadline;
 }
-
+export function getGiveawayDurationInLocaleString(dateString: string) {
+	const time = new Date(dateString);
+	return time.toLocaleString();
+}
 export function getColorFromHexToInt(hex: string) {
 	return parseInt(hex.replace("#", ""), 16);
 }

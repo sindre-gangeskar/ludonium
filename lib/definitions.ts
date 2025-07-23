@@ -44,8 +44,6 @@ export interface SessionProps {
 	status?: "authenticated" | "loading" | "unauthenticated"
 }
 
-
-
 export interface LocationProps {
 	name: string;
 	href: string;
@@ -73,7 +71,7 @@ export interface DiscordEmbedProps {
 	color?: number;
 	thumbnail?: DiscordMediaProps;
 	image?: DiscordMediaProps;
-	fields?: { name: string; value: string; inline: boolean }[];
+	fields?: { name: string; value: string; inline?: boolean }[];
 }
 
 export interface DiscordMessageProps {
@@ -82,13 +80,11 @@ export interface DiscordMessageProps {
 	recipient_id?: string;
 }
 
-interface DiscordMediaProps {
+export interface DiscordMediaProps {
 	url: string;
 	height?: number;
 	width?: number;
 	proxy_url?: string;
 }
-
-export type DiscordAPIRequest = { intent: "channel"; channelId: string; body: DiscordMessageProps } | { intent: "guild"; guildId: string } | { intent: "create-dm-channel"; recipient_id: string };
 
 export type PlatformTypes = "pc" | "console";

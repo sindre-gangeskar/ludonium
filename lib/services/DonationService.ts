@@ -1,6 +1,6 @@
 import { DonationProps, PlatformProps, ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { isKeyValid } from "../utils";
+import { isKeyValid, parseClientPrismaError } from "../utils";
 import DiscordService from "./DiscordService";
 import KeyService from "./KeyService";
 
@@ -33,8 +33,8 @@ export default class DontationService {
 			return { status: "success", statusCode: 201, message: "Successfully created donation" } as ResponseProps;
 		} catch (error) {
 			console.error(error);
-			if (error && typeof error === "object" && "errors" in error) return error as ResponseProps;
-			return { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to create a donation" } as ResponseProps;
+			const prismaError = parseClientPrismaError(error, 'donation');
+			throw prismaError ?? { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to create a donation" } as ResponseProps;
 		}
 	}
 	static async getById(donationId: number) {
@@ -42,6 +42,8 @@ export default class DontationService {
 			return await prisma.donation.findFirstOrThrow({ where: { id: donationId }, include: { key: true, platform: true, region: true } });
 		} catch (error) {
 			console.error(error);
+			const prismaError = parseClientPrismaError(error, 'donation');
+			throw prismaError ?? {status: "error", statusCode: 500, errors: {generic: 'An internal server error has occurred while trying to get donation by id'}} as ResponseProps;
 		}
 	}
 }

@@ -10,17 +10,16 @@ export default class KeyService {
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "key");
-			if (prismaError) return { status: "fail", statusCode: 409, errors: { key: prismaError.message } } as ResponseProps;
-			return { status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while submitting key" } } as ResponseProps;
+			throw prismaError ?? { status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to create key" } } as ResponseProps;
 		}
 	}
 	static async getById(id: number) {
 		try {
-			return await prisma.key.findFirst({ where: { id: id }, include: {Platform: true} });
+			return await prisma.key.findFirst({ where: { id: id }, include: { Platform: true } });
 		} catch (error) {
-			const message = "An internal server message has occurred while retrieving key";
 			console.error(error);
-			return { status: "error", statusCode: 500, errors: { generic: message } } as ResponseProps;
+			const prismaError = parseClientPrismaError(error, "key");
+			throw prismaError ?? { status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to retrieve key by id" } } as ResponseProps;
 		}
 	}
 	static async getAll() {
@@ -28,7 +27,8 @@ export default class KeyService {
 			return await prisma.key.findMany({ include: { Platform: true } });
 		} catch (error) {
 			console.error(error);
-			return { status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while fetching keys" } } as ResponseProps;
+			const prismaError = parseClientPrismaError(error, "key");
+			throw prismaError ?? { status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to get all keys" } } as ResponseProps;
 		}
 	}
 }

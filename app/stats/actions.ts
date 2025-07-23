@@ -1,5 +1,10 @@
+import { ResponseProps } from "@/lib/definitions";
 import DonationService from "@/lib/services/DonationService";
 
 export async function getDonations(discordId: string) {
-	return await DonationService.getAll(discordId);
+	try {
+		return await DonationService.getAll(discordId);
+	} catch (error) {
+		return error as ResponseProps
+	}
 }
