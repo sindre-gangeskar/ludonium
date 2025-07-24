@@ -15,29 +15,38 @@ const app = express();
 
 app.use(express.json());
 
-app.post("/create-giveaway", async (req, res) => {
-	const channel = await bot.channels.fetch(giveawayChannelId);
-	const preview = await bot.fetchGuildPreview(guildId);
-	
-	const { donation, giveaway } = req.body;
-	const dateString = getGiveawayDurationInLocaleString(giveaway.deadline);
+app.post("/create-giveaway", async (req, res, next) => {
+	try {
+		const channel = await bot.channels.fetch(giveawayChannelId);
+		const preview = await bot.fetchGuildPreview(guildId);
 
-	if (channel && channel.isTextBased() && channel.isSendable()) {
-		const embed: DiscordEmbedProps = {
-			color: getColorFromHexToInt("#fdf690"),
-			thumbnail: { url: preview.iconURL() ?? "" },
-			title: "Community Game Key Giveaway",
-			description: "A game key giveaway has started for a donated game!\nMake sure to react to this message to participate in the giveaway!",
-			fields: [
-				{ name: "Platform", value: capitalizeString(donation.platform.name) },
-				{ name: "Region", value: donation.region.name.toUpperCase() },
-				{ name: "Giveaway Ends", value: dateString },
-			],
-		};
-		const body: DiscordMessageProps = { embeds: [embed] };
-		const message = await channel.send(body);
-		await GiveawayService.updateById(giveaway.id, message.id);
-		return res.json({ message: "Successfully sent giveaway from bot service", statusCode: 200 });
+		const { donation, giveaway } = req.body;
+		const dateString = getGiveawayDurationInLocaleString(giveaway.deadline);
+
+		if (channel && channel.isTextBased() && channel.isSendable()) {
+			const embed: DiscordEmbedProps = {
+				color: getColorFromHexToInt("#fdf690"),
+				thumbnail: { url: preview.iconURL() ?? "" },
+				title: "Community Game Key Giveaway",
+				description: "A game key giveaway has started for a donated game!\nMake sure to react to this message to participate in the giveaway!",
+				fields: [
+					{ name: "Platform", value: capitalizeString(donation.platform.name) },
+					{ name: "Region", value: donation.region.name.toUpperCase() },
+					{ name: "Giveaway Ends", value: dateString },
+				],
+			};
+			const body: DiscordMessageProps = { embeds: [embed] };
+			const message = await channel.send(body);
+			await GiveawayService.updateById(giveaway.id, message.id);
+			return res.json({ message: "Successfully sent giveaway from bot service", statusCode: 200 });
+		}
+	} catch (error) {
+		if (error && typeof error === "object" && "code" in error) {
+			console.warn("The bot is missing the required permissions to send a message in the channel. Ensure it has the rights to send messages.");
+		} else {
+			console.error(error);
+		}
+		next();
 	}
 });
 app.get("/get-guild-info", async (req, res) => {

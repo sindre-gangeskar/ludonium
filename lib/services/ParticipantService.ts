@@ -6,7 +6,7 @@ export default class ParticipantService {
 	static async create(giveawayId: number, discordId: string) {
 		try {
 			return await prisma.participant.upsert({
-				where: { discordId_giveawayId: { giveawayId: giveawayId, discordId: discordId } },
+				where: { discordId_giveawayId: { discordId, giveawayId } },
 				update: { giveawayId: giveawayId, discordId: discordId },
 				create: { giveawayId: giveawayId, discordId: discordId },
 			});
