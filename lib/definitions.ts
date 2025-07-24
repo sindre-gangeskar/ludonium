@@ -72,12 +72,20 @@ export interface DiscordEmbedProps {
 	thumbnail?: DiscordMediaProps;
 	image?: DiscordMediaProps;
 	fields?: { name: string; value: string; inline?: boolean }[];
+	footer?: DiscordEmbedFooterProps;
+}
+
+export interface DiscordEmbedFooterProps {
+	text: string,
+	icon_url?: string, 
+	icon_proxy_url?: string
 }
 
 export interface DiscordMessageProps {
 	content?: string;
 	embeds?: DiscordEmbedProps[];
 	recipient_id?: string;
+	footer?: DiscordEmbedFooterProps
 }
 
 export interface DiscordMediaProps {

@@ -6,7 +6,7 @@
     "seed": "bun prisma/seed.ts"
   },
   "scripts": {
-    "dev": "concurrently \"next dev --turbopack \"  \"bun --hot server.ts\"",
+    "dev": "concurrently \"next dev --turbopack \"  \"bun server.ts\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

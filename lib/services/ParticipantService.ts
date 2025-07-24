@@ -1,6 +1,7 @@
 import { ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
 import { parseClientPrismaError } from "../utils";
+import GiveawayService from "./GiveawayService";
 
 export default class ParticipantService {
 	static async create(giveawayId: number, discordId: string) {
@@ -23,6 +24,18 @@ export default class ParticipantService {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "participant");
 			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to retrieve participants by giveaway id" } } as ResponseProps);
+		}
+	}
+	static async delete(giveawayId: number, discordId: string) {
+		try {
+			const giveaway = await GiveawayService.getById(giveawayId);
+			const participant = await prisma.participant.findFirst({ where: { discordId, giveawayId} });
+			if (participant && giveaway) return await prisma.participant.delete({ where: { discordId_giveawayId: { giveawayId: giveaway.id, discordId } } });
+			else return null;
+		} catch (error) {
+			console.error(error);
+			const prismaError = parseClientPrismaError(error, "participant");
+			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to delete participant" } } as ResponseProps);
 		}
 	}
 }

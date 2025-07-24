@@ -27,7 +27,7 @@ export default class GiveawayService {
 	}
 	static async getById(id: number) {
 		try {
-			return await prisma.giveaway.findFirstOrThrow({ where: { id: id } });
+			return await prisma.giveaway.findFirst({ where: { id: id } });
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "giveaway");
@@ -36,7 +36,7 @@ export default class GiveawayService {
 	}
 	static async getByMessageId(discordMessageId: string) {
 		try {
-			return await prisma.giveaway.findFirstOrThrow({ where: { messageId: discordMessageId } });
+			return await prisma.giveaway.findFirst({ where: { messageId: discordMessageId } });
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, 'giveaway');

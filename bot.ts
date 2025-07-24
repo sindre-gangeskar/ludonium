@@ -13,21 +13,38 @@ export default function DiscordBot() {
 	client.on("ready", () => {
 		console.log("Discord Bot is ready");
 	});
-	client.login(process.env.DISCORD_BOT_TOKEN);
+	client.login(token);
 
 	client.on("messageReactionAdd", async (reaction, user) => {
 		try {
 			if (reaction && reaction.message.id) {
 				const messageId = reaction.message.id;
-				console.log(messageId);
 				const giveaway = await GiveawayService.getByMessageId(messageId);
-				if (reaction.message.id === giveaway.messageId) {
-					await ParticipantService.create(giveaway.id, user.id);
-					console.info(`User ${user.id} has entered giveaway ID: ${giveaway.id}`);
+				if (giveaway && reaction.message.id === giveaway.messageId) await ParticipantService.create(giveaway.id, user.id);
+			}
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	});
+	client.on("messageReactionRemove", async (reaction, user) => {
+		try {
+			if (reaction && reaction.message.id) {
+				const giveaway = await GiveawayService.getByMessageId(reaction.message.id);
+
+				if (giveaway && reaction.message.id === giveaway.messageId) {
+					await ParticipantService.delete(giveaway.id, user.id);
+					const message = reaction.message;
+
+					for (const [, reaction] of message.reactions.cache) {
+						const reacted = await reaction.users.fetch().then(users => users.has(user.id));
+						if (reacted) await reaction.users.remove(user.id);
+					}
 				}
 			}
 		} catch (error) {
 			console.error(error);
+			return null;
 		}
 	});
 

@@ -64,7 +64,6 @@ model Giveaway {
   messageId       String?
   winnerDiscordId String?
   duration        DateTime
-  participantId   Int?
   participant     Participant[]
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt

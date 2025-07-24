@@ -33,7 +33,13 @@ app.post("/create-giveaway", async (req, res, next) => {
 					{ name: "Platform", value: capitalizeString(donation.platform.name) },
 					{ name: "Region", value: donation.region.name.toUpperCase() },
 					{ name: "Giveaway Ends", value: dateString },
+					{
+						name: "Privacy Notice",
+						value: `By reacting to this giveaway, you consent to the registration of you as a participant by storing your **Discord ID** as a way to recognize you as a participant.
+					\nYou can remove your participation and delete your data related to **this** giveaway by removing your reaction from this message.`,
+					},
 				],
+				footer: {text: 'NOTE: Adding multiple reactions will NOT increase your chances at winning.'}
 			};
 			const body: DiscordMessageProps = { embeds: [embed] };
 			const message = await channel.send(body);
