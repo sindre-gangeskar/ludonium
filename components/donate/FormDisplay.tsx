@@ -8,7 +8,6 @@ import { submitDonation } from "@/app/donate/actions";
 
 import FormTerms from "./FormTerms";
 import FormSuccess from "./FormSuccess";
-import FormInputError from "./FormInputError";
 import FormError from "./FormError";
 import Header from "../ui/Header";
 
@@ -17,6 +16,7 @@ import gsap from "gsap";
 
 import { ResponseProps } from "@/lib/definitions";
 import FormKeyFormatGuide from "./FormKeyFormatGuide";
+import StateMessage from "../ui/StateMessage";
 
 export default function FormDisplay({ platforms, platformTypes, regions }: { platforms: PlatformProps[]; platformTypes: PlatformTypeProps[]; regions: RegionProps[] }) {
 	const { data } = useSession();
@@ -180,7 +180,7 @@ export default function FormDisplay({ platforms, platformTypes, regions }: { pla
 									Game Key
 								</FormLabel>
 								<Input required color="secondary" name={"key"} placeholder={`Enter your ${activePlatform.name} key here...`}></Input>
-								{state?.errors && "key" in state?.errors && <FormInputError>{state.errors.key}</FormInputError>}
+								<StateMessage state={state} errorKey="key" prioritize={["error", "fail"]} />
 							</FormControl>
 							<FormKeyFormatGuide platform={activePlatform.name} />
 						</CardContent>

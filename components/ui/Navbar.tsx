@@ -17,12 +17,7 @@ export default function Navbar() {
 	const locations: LocationProps[] = [
 		{ name: "Home", href: "/" },
 		{ name: "Community", href: "/community" },
-		...(status === "authenticated"
-			? [
-					{ name: "Donate", href: "/donate" },
-					{ name: "My Stats", href: "/stats" },
-			  ]
-			: []),
+		...(status === "authenticated" ? [{ name: "Donate", href: "/donate" }, { name: "My Stats", href: "/stats" }, ...(data.isAdmin ? [{ name: "Admin", href: "/admin/dashboard" }] : [])] : []),
 	];
 
 	return (

@@ -57,12 +57,12 @@ export function parseClientPrismaError(error: unknown, tableName: string): { mes
 			case "P2002": {
 				error.name = `Duplicate${name}RecordEntryError`;
 				error.message = `${name} already exists in the database`;
-				throw { status: "fail", statusCode: 409, errors: { key: error.message } } as ResponseProps;
+				throw { status: "fail", statusCode: 409, errors: { [tableName.toLowerCase()]: error.message } } as ResponseProps;
 			}
 			case "P2025": {
 				error.name = `Record${name}NotFoundError`;
 				error.message = `Failed to find ${name} record`;
-				throw { status: "fail", statusCode: 404, errors: { key: error.message } } as ResponseProps;
+				throw { status: "fail", statusCode: 404, errors: { [tableName.toLowerCase()]: error.message } } as ResponseProps;
 			}
 			default:
 				break;

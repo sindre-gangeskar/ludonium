@@ -40,6 +40,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 			},
 		},
 		components: {
+			JoyCard: {styleOverrides: {root: {borderRadius: '1.5rem'}}},
 			JoyButton: {
 				styleOverrides: {
 					root: {

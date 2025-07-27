@@ -48,7 +48,7 @@ model Donation {
   regionId       Int
   region         Region        @relation(fields: [regionId], references: [id])
   giveawayId     Int?          @unique
-  giveaway       Giveaway?
+  giveaway       Giveaway?     @relation(fields: [giveawayId], references: [id])
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -58,8 +58,7 @@ model Donation {
 model Giveaway {
   id              Int           @id @default(autoincrement())
   statusId        Int
-  donationId      Int           @unique
-  donation        Donation      @relation(fields: [donationId], references: [id])
+  donation        Donation?     
   status          Status        @relation(fields: [statusId], references: [id])
   messageId       String?
   winnerDiscordId String?
@@ -74,7 +73,7 @@ model Giveaway {
 model Participant {
   id         Int      @id @default(autoincrement())
   discordId  String
-  giveawayId Int      
+  giveawayId Int
   Giveaway   Giveaway @relation(fields: [giveawayId], references: [id])
 
   @@unique([discordId, giveawayId])

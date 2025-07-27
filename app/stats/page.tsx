@@ -1,15 +1,10 @@
 import { DonationsData } from "@/components/stats/DonationsData";
-import { Typography } from "@mui/joy";
+import Loader from "@/components/ui/Loader";
 import { Suspense } from "react";
 
 export default function Page() {
 	return (
-		<Suspense
-			fallback={
-				<Typography level="h3" textAlign={"center"}>
-					Fetching data...
-				</Typography>
-			}>
+		<Suspense fallback={<Loader />}>
 			<DonationsData />
 		</Suspense>
 	);

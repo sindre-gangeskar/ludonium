@@ -1,11 +1,11 @@
-import Form from "@/components/donate/Form";
+import DashboardData from "@/components/admin/DashboardData";
 import Loader from "@/components/ui/Loader";
 import { Suspense } from "react";
 
 export default function Page() {
 	return (
-		<Suspense fallback={<Loader />}>
-			<Form />
+		<Suspense fallback={<Loader/>}>
+			<DashboardData />
 		</Suspense>
 	);
 }

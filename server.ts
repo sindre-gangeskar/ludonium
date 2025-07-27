@@ -7,9 +7,11 @@ import GiveawayService from "./lib/services/GiveawayService";
 const bot = DiscordBot();
 const giveawayChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_ID?.toString().trim();
 const guildId = process.env.DISCORD_GUILD_ID?.toString().trim();
+const adminRoleId = process.env.DISCORD_ADMIN_ROLE_ID?.toString().trim();
 
-if (!giveawayChannelId) throw new Error("Missing Discord giveaway channel id environment variable");
-if (!guildId) throw new Error("Missing Discord guild id environment variable");
+if (!giveawayChannelId) throw new Error("Missing DISCORD_GIVEAWAY_CHANNEL_ID environment variable");
+if (!guildId) throw new Error("Missing DISCORD_GUILD_ID environment variable");
+if (!adminRoleId) throw new Error("Missing DISCORD_ADMIN_ROLE_ID environment variable");
 
 const app = express();
 
@@ -39,7 +41,7 @@ app.post("/create-giveaway", async (req, res, next) => {
 					\nYou can remove your participation and delete your data related to **this** giveaway by removing your reaction from this message.`,
 					},
 				],
-				footer: {text: 'NOTE: Adding multiple reactions will NOT increase your chances at winning.'}
+				footer: { text: "NOTE: Adding multiple reactions will NOT increase your chances at winning." },
 			};
 			const body: DiscordMessageProps = { embeds: [embed] };
 			const message = await channel.send(body);
@@ -64,6 +66,19 @@ app.get("/discord-test", async (req, res) => {
 	if (channel && channel.isTextBased() && channel.isSendable()) channel.send({ content: "Testing a ping message" });
 
 	return res.status(200).json({ status: "success", statusCode: 200, message: "Successfully sent test message" } as ResponseProps);
+});
+app.get("/verify-admin-role/:discordId", async (req, res) => {
+	try {
+		const discordId = req.params.discordId;
+		const guild = await bot.guilds.fetch({guild: guildId, force: true});
+		const member = await guild.members.fetch({ user: discordId, force: true });
+		const moderatorRole = member.roles.cache.has(adminRoleId);
+
+		return res.status(200).json({ status: "success", statusCode: 200, data: { isAdmin: moderatorRole } });
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ status: "error", statusCode: 500, message: "An error has occurred while trying to verify admin role" });
+	}
 });
 app.listen(process.env.SERVER_PORT || 3001, () => {
 	console.log("Express server listening on 3001");

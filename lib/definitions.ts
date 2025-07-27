@@ -12,7 +12,7 @@ export interface RegionProps {
 
 export interface StatusProps {
 	id?: number;
-	name: string
+	name: string;
 }
 
 export interface PlatformTypeProps {
@@ -24,7 +24,7 @@ export interface DonationProps {
 	region: RegionProps;
 	discordId?: string;
 	platformType: PlatformTypeProps["name"];
-	platform: PlatformProps[ "name" ];
+	platform: PlatformProps["name"];
 }
 
 export interface KeyProps {
@@ -41,7 +41,7 @@ export interface GuildProps {
 export interface SessionProps {
 	isMemberOfGuild: boolean;
 	guild: { name: string; id: string; icon?: string };
-	status?: "authenticated" | "loading" | "unauthenticated"
+	status?: "authenticated" | "loading" | "unauthenticated";
 }
 
 export interface LocationProps {
@@ -49,20 +49,27 @@ export interface LocationProps {
 	href: string;
 }
 
+export interface GiveawayCountProps {
+	pcActiveCount: number;
+	pcInactiveCount: number;
+	consoleActiveCount: number;
+	consoleInactiveCount: number;
+}
+
 export interface DonationFormErrorProps {
-	key?: string;
+	[key: string]: string;
 }
 
 export interface GenericErrorProps {
-	generic?: string;
+	[key: string]: string;
 }
 
-export interface ResponseProps {
+export interface ResponseProps<T = unknown> {
 	status: "success" | "error" | "fail";
 	statusCode: 200 | 201 | 400 | 401 | 404 | 409 | 500;
 	message?: string;
 	errors?: DonationFormErrorProps | GenericErrorProps;
-	data?: unknown;
+	data?: T;
 }
 
 export interface DiscordEmbedProps {
@@ -75,17 +82,22 @@ export interface DiscordEmbedProps {
 	footer?: DiscordEmbedFooterProps;
 }
 
+export interface DiscordRoleProps {
+	id: string;
+	name?: string;
+}
+
 export interface DiscordEmbedFooterProps {
-	text: string,
-	icon_url?: string, 
-	icon_proxy_url?: string
+	text: string;
+	icon_url?: string;
+	icon_proxy_url?: string;
 }
 
 export interface DiscordMessageProps {
 	content?: string;
 	embeds?: DiscordEmbedProps[];
 	recipient_id?: string;
-	footer?: DiscordEmbedFooterProps
+	footer?: DiscordEmbedFooterProps;
 }
 
 export interface DiscordMediaProps {

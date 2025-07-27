@@ -8,7 +8,7 @@ export default class RegionService {
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "region");
-			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to get regions" } } as ResponseProps);
+			throw prismaError ?? ({ status: "error", statusCode: 500, data: [], errors: { generic: "An internal server error has occurred while trying to get regions" } } as ResponseProps);
 		}
 	}
 }

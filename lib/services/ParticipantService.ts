@@ -14,7 +14,7 @@ export default class ParticipantService {
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "participant");
-			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to create participant" } } as ResponseProps);
+			throw prismaError ?? ({ status: "error", statusCode: 500, data: [], errors: { generic: "An internal server error has occurred while trying to create participant" } } as ResponseProps);
 		}
 	}
 	static async getByGiveawayId(giveawayId: number) {
@@ -23,19 +23,21 @@ export default class ParticipantService {
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "participant");
-			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to retrieve participants by giveaway id" } } as ResponseProps);
+			throw (
+				prismaError ?? ({ status: "error", statusCode: 500, data: [], errors: { generic: "An internal server error has occurred while trying to retrieve participants by giveaway id" } } as ResponseProps)
+			);
 		}
 	}
 	static async delete(giveawayId: number, discordId: string) {
 		try {
 			const giveaway = await GiveawayService.getById(giveawayId);
-			const participant = await prisma.participant.findFirst({ where: { discordId, giveawayId} });
+			const participant = await prisma.participant.findFirst({ where: { discordId, giveawayId } });
 			if (participant && giveaway) return await prisma.participant.delete({ where: { discordId_giveawayId: { giveawayId: giveaway.id, discordId } } });
 			else return null;
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "participant");
-			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to delete participant" } } as ResponseProps);
+			throw prismaError ?? ({ status: "error", statusCode: 500, data: [], errors: { generic: "An internal server error has occurred while trying to delete participant" } } as ResponseProps);
 		}
 	}
 }
