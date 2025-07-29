@@ -3,7 +3,7 @@ import { PlatformProps, ResponseProps } from "./definitions";
 import crypto from "crypto";
 
 const secretToken = Buffer.from(process.env.ENCRYPT_SECRET || "", "hex");
-if (!secretToken) throw new Error("Missing encryption secret");
+if (!secretToken) throw new Error("Missing ENCRYPT_SECRET environment variable");
 
 export function applyGradientColors(theme: Theme, mode: "dark" | "light" | "system" | undefined, color: ColorPaletteProp = "primary") {
 	if (mode === "dark") {
@@ -77,14 +77,14 @@ export function capitalizeString(string: string) {
 }
 export function encrypt(value: string) {
 	const iv = crypto.randomBytes(12);
-	const cipher = crypto.createCipheriv("aes-128-ccm", secretToken, iv, { authTagLength: 16 });
+	const cipher = crypto.createCipheriv("aes-128-gcm", secretToken, iv, { authTagLength: 16 });
 	const encrypted = Buffer.concat([cipher.update(value), cipher.final()]);
 	const authTag = cipher.getAuthTag();
 
 	return { encrypted, iv, authTag };
 }
 export function decrypt(encrypted: string, iv: string, authTag: string) {
-	const decipher = crypto.createDecipheriv("aes-128-ccm", secretToken, Buffer.from(iv, "hex"), { authTagLength: 16 });
+	const decipher = crypto.createDecipheriv("aes-128-gcm", secretToken, Buffer.from(iv, "hex"), { authTagLength: 16 });
 	decipher.setAuthTag(Buffer.from(authTag, "hex"));
 	const decrypted = Buffer.concat([decipher.update(Buffer.from(encrypted, "hex")), decipher.final()]);
 	return decrypted.toString("utf-8");
@@ -95,7 +95,7 @@ export function generateKeyHash(key: string) {
 export function getGiveawayDurationInDateTime(days: number) {
 	const time = new Date();
 	const duration = 1000 * 60 * 60 * 24 * days;
-	const deadline = new Date(time.getTime() + duration);
+	const deadline = new Date(time.getTime() + duration).toISOString();
 	return deadline;
 }
 export function getGiveawayDurationInLocaleString(dateString: string) {

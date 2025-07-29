@@ -1,6 +1,6 @@
 "use server";
 import { DonationProps, ResponseProps } from "@/lib/definitions";
-import DontationService from "@/lib/services/DonationService";
+import DonationService from "@/lib/services/DonationService";
 import GiveawayService from "@/lib/services/GiveawayService";
 import { revalidatePath } from "next/cache";
 
@@ -11,8 +11,8 @@ interface DonationsDataProps {
 
 export async function getAvailableDonationsCount() {
 	try {
-		const pcCount = await DontationService.getCountByPlatformType("pc");
-		const consoleCount = await DontationService.getCountByPlatformType("console");
+		const pcCount = await DonationService.getCountByPlatformType("pc");
+		const consoleCount = await DonationService.getCountByPlatformType("console");
 		return { status: "success", statusCode: 200, message: "Successfully retrieved donation counts", data: { pc: pcCount, console: consoleCount } } as ResponseProps<DonationsDataProps>;
 	} catch (error) {
 		return error as ResponseProps<DonationProps>;

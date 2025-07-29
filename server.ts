@@ -1,10 +1,11 @@
 import express from "express";
-import DiscordBot from "./bot";
+import client from "./bot";
 import { DiscordEmbedProps, DiscordMessageProps, ResponseProps } from "./lib/definitions";
 import { capitalizeString, getColorFromHexToInt, getGiveawayDurationInLocaleString } from "./lib/utils";
-import GiveawayService from "./lib/services/GiveawayService";
 
-const bot = DiscordBot();
+import GiveawayService from "./lib/services/GiveawayService";
+import ParticipantService from "./lib/services/ParticipantService";
+
 const giveawayChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_ID?.toString().trim();
 const guildId = process.env.DISCORD_GUILD_ID?.toString().trim();
 const adminRoleId = process.env.DISCORD_ADMIN_ROLE_ID?.toString().trim();
@@ -19,8 +20,8 @@ app.use(express.json());
 
 app.post("/create-giveaway", async (req, res, next) => {
 	try {
-		const channel = await bot.channels.fetch(giveawayChannelId);
-		const preview = await bot.fetchGuildPreview(guildId);
+		const channel = await client.channels.fetch(giveawayChannelId);
+		const preview = await client.fetchGuildPreview(guildId);
 
 		const { donation, giveaway } = req.body;
 		const dateString = getGiveawayDurationInLocaleString(giveaway.deadline);
@@ -57,12 +58,30 @@ app.post("/create-giveaway", async (req, res, next) => {
 		next();
 	}
 });
+app.post("/send-winner-dm/:discordId", async (req, res, next) => {
+	try {
+		const { body } = req;
+		const discordId = req.params.discordId;
+
+		const discordUser = await client.users.fetch(discordId);
+		if (!discordId || !discordUser) throw new Error("Unable to find Discord User with provided id");
+
+		const dmChannel = await discordUser.createDM(true);
+		if (!dmChannel || !dmChannel.isSendable()) throw new Error("Failed to establish dm channel connection with discord user");
+
+		await dmChannel.send({ embeds: body.embeds });
+		return res.json({ status: "success", statusCode: 200, message: "Successfully sent dm to winner" } as ResponseProps);
+	} catch (error) {
+		console.error(error);
+		next();
+	}
+});
 app.get("/get-guild-info", async (req, res) => {
-	const data = await bot.fetchGuildPreview(guildId);
+	const data = await client.fetchGuildPreview(guildId);
 	return res.status(200).json({ status: "success", message: "Successfully retrieved guild info", data: data } as ResponseProps);
 });
 app.get("/discord-test", async (req, res) => {
-	const channel = await bot.channels.fetch(giveawayChannelId);
+	const channel = await client.channels.fetch(giveawayChannelId);
 	if (channel && channel.isTextBased() && channel.isSendable()) channel.send({ content: "Testing a ping message" });
 
 	return res.status(200).json({ status: "success", statusCode: 200, message: "Successfully sent test message" } as ResponseProps);
@@ -70,7 +89,7 @@ app.get("/discord-test", async (req, res) => {
 app.get("/verify-admin-role/:discordId", async (req, res) => {
 	try {
 		const discordId = req.params.discordId;
-		const guild = await bot.guilds.fetch({guild: guildId, force: true});
+		const guild = await client.guilds.fetch({ guild: guildId, force: true });
 		const member = await guild.members.fetch({ user: discordId, force: true });
 		const moderatorRole = member.roles.cache.has(adminRoleId);
 
@@ -79,6 +98,13 @@ app.get("/verify-admin-role/:discordId", async (req, res) => {
 		console.error(error);
 		return res.status(500).json({ status: "error", statusCode: 500, message: "An error has occurred while trying to verify admin role" });
 	}
+});
+app.get("/assign-winner/:giveawayId", async (req, res) => {
+	const giveawayId = req.params.giveawayId;
+	const participants = await ParticipantService.getByGiveawayId(+giveawayId);
+	const winnerSelection = Math.floor(Math.random() * participants.length);
+	const winner = await client.users.fetch(participants[winnerSelection].discordId);
+	return res.status(200).json({ status: "success", statusCode: 200, data: { user: { id: winner.id } } } as ResponseProps);
 });
 app.listen(process.env.SERVER_PORT || 3001, () => {
 	console.log("Express server listening on 3001");

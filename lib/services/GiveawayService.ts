@@ -1,8 +1,16 @@
 import { PlatformTypeProps, ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { getGiveawayDurationInDateTime, parseClientPrismaError } from "../utils";
+import { decrypt, getGiveawayDurationInDateTime, parseClientPrismaError } from "../utils";
 import DiscordService from "./DiscordService";
-import DontationService from "./DonationService";
+import DonationService from "./DonationService";
+import ParticipantService from "./ParticipantService";
+import axios from "axios";
+
+const giveawayChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_ID;
+if (!giveawayChannelId) throw new Error("Missing DISCORD_GIVEAWAY_CHANNEL_ID environment variable");
+
+const serverURL = process.env.DISCORD_SERVER_URL;
+if (!serverURL) throw new Error("Missing DISCORD_SERVER_URL environment variable");
 
 export default class GiveawayService {
 	static async create(donationId: number) {
@@ -10,7 +18,7 @@ export default class GiveawayService {
 			const status = await prisma.status.findFirstOrThrow({ where: { name: "active" } });
 			const deadline = getGiveawayDurationInDateTime(2);
 			const giveaway = await prisma.giveaway.create({ data: { statusId: status.id, duration: deadline } });
-			await DontationService.assignGiveawayId(donationId, giveaway.id);
+			await DonationService.assignGiveawayId(donationId, giveaway.id);
 			return giveaway;
 		} catch (error) {
 			console.error(error);
@@ -66,7 +74,7 @@ export default class GiveawayService {
 	}
 	static async createRandomGiveaway(platformType: PlatformTypeProps["name"]) {
 		try {
-			const donations = await DontationService.getByPlatformType(platformType);
+			const donations = await DonationService.getByPlatformType(platformType);
 			if (donations.length > 0) {
 				const randomSelection = Math.floor(Math.random() * donations.length);
 				await DiscordService.createGiveaway(donations[randomSelection].id);
@@ -83,6 +91,39 @@ export default class GiveawayService {
 			throw (
 				prismaError ?? ({ status: "error", statusCode: 500, errors: { [platformType]: `An internal server error has occurred while trying to create random ${platformType} giveaway` } } as ResponseProps)
 			);
+		}
+	}
+	static async checkGiveaways() {
+		try {
+			const giveaways = await this.getAll();
+			const now = new Date(Date.now()).toISOString();
+
+			for (const giveaway of giveaways) {
+				if (!giveaway.messageId) continue;
+				const endDate = new Date(giveaway.duration).toISOString();
+				const participants = await ParticipantService.getByGiveawayId(giveaway.id);
+
+				if (participants.length > 0 && now > endDate && !giveaway.winnerDiscordId) {
+					const response = await axios.get(`${serverURL}/assign-winner/${giveaway.id}`);
+					const body = response.data;
+
+					/* Assign winner ID to giveaway */
+					await this.updateById(giveaway.id, giveaway.messageId?.toString(), body.data.user.id);
+
+					/* Retrieve the associated donation and the game key */
+					const donation = await DonationService.getByGiveawayId(giveaway.id);
+					const key = donation?.key;
+
+					if (key && key.key && body.data.user.id) {
+						const decrypted = decrypt(key.key, key.iv, key.authTag);
+						return await DiscordService.sendGiveawayWinDM(body.data.user.id, decrypted, donation.platform.name, donation.region.name);
+					} else throw new Error("Failed to send giveaway winner a direct message, please check console logs");
+				}
+			}
+		} catch (error) {
+			console.error(error);
+			const prismaError = parseClientPrismaError(error, "giveaways");
+			throw prismaError ?? ({ status: "error", statusCode: 500, message: "An internal server error has occurred while trying to check giveaways" } as ResponseProps);
 		}
 	}
 }

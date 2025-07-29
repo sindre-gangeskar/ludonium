@@ -6,7 +6,7 @@ import DiscordService from "./DiscordService";
 import KeyService from "./KeyService";
 
 const allowAutoGiveaway = Boolean(process.env.DISCORD_ALLOW_AUTO_GIVEAWAY === "true");
-export default class DontationService {
+export default class DonationService {
 	static async getAll(discordId: string) {
 		try {
 			return (await prisma.donation.findMany({ where: { discordId: discordId }, include: { platform: true, platformType: true, region: true } })).map(donation => ({
@@ -89,6 +89,15 @@ export default class DontationService {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "donations");
 			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while assigning a giveaway id to donation" } } as ResponseProps);
+		}
+	}
+	static async getByGiveawayId(id: number) {
+		try {
+			return await prisma.donation.findFirst({ where: { giveawayId: id }, include: { key: true, platform: true, region: true } });
+		} catch (error) {
+			console.error(error);
+			const prismaError = parseClientPrismaError(error, "donations");
+			throw prismaError ?? ({ status: "error", statusCode: 500, message: "An internal server error has occurred while trying to retrieve giveaway by donation id" } as ResponseProps);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 "use server";
 import PlatformService from "@/lib/services/PlatformService";
-import DontationService from "@/lib/services/DonationService";
+import DonationService from "@/lib/services/DonationService";
 import { PlatformProps, RegionProps, ResponseProps } from "@/lib/definitions";
 import RegionService from "@/lib/services/RegionService";
 
@@ -24,7 +24,7 @@ export async function getAllRegions() {
 
 export async function submitDonation(_state: ResponseProps | null, formdata: FormData) {
 	try {
-		await DontationService.create(formdata);
+		await DonationService.create(formdata);
 		return { status: "success", statusCode: 201, message: "Successfully created donation" } as ResponseProps;
 	} catch (error) {
 		return error as ResponseProps;
