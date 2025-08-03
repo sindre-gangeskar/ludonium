@@ -1,16 +1,20 @@
 import { ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { parseClientPrismaError } from "../utils";
+import { isGiveawayExpired, parseClientPrismaError } from "../utils";
 import GiveawayService from "./GiveawayService";
 
 export default class ParticipantService {
 	static async create(giveawayId: number, discordId: string) {
 		try {
-			return await prisma.participant.upsert({
-				where: { discordId_giveawayId: { discordId, giveawayId } },
-				update: { giveawayId: giveawayId, discordId: discordId },
-				create: { giveawayId: giveawayId, discordId: discordId },
-			});
+			const giveaway = await GiveawayService.getById(giveawayId);
+
+			if (giveaway && (giveaway.status.name === "active" && !isGiveawayExpired(giveaway.duration))) {
+				return await prisma.participant.upsert({
+					where: { discordId_giveawayId: { discordId, giveawayId } },
+					update: { giveawayId: giveawayId, discordId: discordId },
+					create: { giveawayId: giveawayId, discordId: discordId },
+				});
+			} else return null;
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "participant");

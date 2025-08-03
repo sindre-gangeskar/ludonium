@@ -5,18 +5,20 @@ import DiscordService from "./DiscordService";
 import DonationService from "./DonationService";
 import ParticipantService from "./ParticipantService";
 import axios from "axios";
-
+import { isGiveawayExpired } from "../utils";
 const giveawayChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_ID;
 if (!giveawayChannelId) throw new Error("Missing DISCORD_GIVEAWAY_CHANNEL_ID environment variable");
 
 const serverURL = process.env.DISCORD_SERVER_URL;
 if (!serverURL) throw new Error("Missing DISCORD_SERVER_URL environment variable");
 
+const customGiveawayDuration = process.env.DISCORD_GIVEAWAY_DURATION;
+
 export default class GiveawayService {
 	static async create(donationId: number) {
 		try {
 			const status = await prisma.status.findFirstOrThrow({ where: { name: "active" } });
-			const deadline = getGiveawayDurationInDateTime(2);
+			const deadline = getGiveawayDurationInDateTime(customGiveawayDuration ? +customGiveawayDuration : 2);
 			const giveaway = await prisma.giveaway.create({ data: { statusId: status.id, duration: deadline } });
 			await DonationService.assignGiveawayId(donationId, giveaway.id);
 			return giveaway;
@@ -37,7 +39,7 @@ export default class GiveawayService {
 	}
 	static async getById(id: number) {
 		try {
-			return await prisma.giveaway.findFirstOrThrow({ where: { id: id } });
+			return await prisma.giveaway.findFirstOrThrow({ where: { id: id }, include: { status: true } });
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "giveaway");
@@ -46,7 +48,7 @@ export default class GiveawayService {
 	}
 	static async getByMessageId(discordMessageId: string) {
 		try {
-			return await prisma.giveaway.findFirst({ where: { messageId: discordMessageId } });
+			return await prisma.giveaway.findFirst({ where: { messageId: discordMessageId }, include: { status: true } });
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "giveaway");
@@ -96,15 +98,14 @@ export default class GiveawayService {
 	static async checkGiveaways() {
 		try {
 			const giveaways = await this.getAll();
-			const now = new Date(Date.now()).toISOString();
 
 			for (const giveaway of giveaways) {
 				if (!giveaway.messageId) continue;
-				const endDate = new Date(giveaway.duration).toISOString();
+
 				const participants = await ParticipantService.getByGiveawayId(giveaway.id);
 
-				if (participants.length > 0 && now > endDate && !giveaway.winnerDiscordId) {
-					const response = await axios.get(`${serverURL}/assign-winner/${giveaway.id}`);
+				if (participants.length > 0 && isGiveawayExpired(giveaway.duration) && !giveaway.winnerDiscordId) {
+					const response = await axios.get(`${serverURL}/get-winner/${giveaway.id}`);
 					const body = response.data;
 
 					/* Assign winner ID to giveaway */
@@ -116,7 +117,8 @@ export default class GiveawayService {
 
 					if (key && key.key && body.data.user.id) {
 						const decrypted = decrypt(key.key, key.iv, key.authTag);
-						return await DiscordService.sendGiveawayWinDM(body.data.user.id, decrypted, donation.platform.name, donation.region.name);
+						await DiscordService.sendGiveawayWinDM(body.data.user.id, decrypted, donation.platform.name, donation.region.name);
+						this.softDelete(giveaway.id);
 					} else throw new Error("Failed to send giveaway winner a direct message, please check console logs");
 				}
 			}

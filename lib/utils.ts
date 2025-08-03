@@ -105,3 +105,8 @@ export function getGiveawayDurationInLocaleString(dateString: string) {
 export function getColorFromHexToInt(hex: string) {
 	return parseInt(hex.replace("#", ""), 16);
 }
+export function isGiveawayExpired(giveawayDuration: Date) {
+	const now = new Date(Date.now()).toISOString();
+	const endDate = new Date(giveawayDuration).toISOString();
+	return now > endDate;
+}

@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits, Partials } from "discord.js";
 import GiveawayService from "./lib/services/GiveawayService";
 import ParticipantService from "./lib/services/ParticipantService";
+import { isGiveawayExpired } from "./lib/utils";
 
 const token = process.env.DISCORD_BOT_TOKEN;
 if (!token) throw new Error("Missing Discord Bot Token environment variable");
@@ -12,7 +13,7 @@ const client = new Client({
 
 client.on("ready", async () => {
 	console.log("Discord Bot is ready");
-	await checkGiveawaysInterval(0.25);
+	await checkGiveawaysInterval(15);
 });
 client.login(token);
 
@@ -21,7 +22,10 @@ client.on("messageReactionAdd", async (reaction, user) => {
 		if (reaction && reaction.message.id) {
 			const messageId = reaction.message.id;
 			const giveaway = await GiveawayService.getByMessageId(messageId);
-			if (giveaway && reaction.message.id === giveaway.messageId) await ParticipantService.create(giveaway.id, user.id);
+
+			if (giveaway && !isGiveawayExpired(giveaway.duration) && reaction.message.id === giveaway.messageId) {
+				await ParticipantService.create(giveaway.id, user.id);
+			} else reaction.remove();
 		}
 	} catch (error) {
 		console.error(error);

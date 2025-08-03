@@ -80,12 +80,6 @@ app.get("/get-guild-info", async (req, res) => {
 	const data = await client.fetchGuildPreview(guildId);
 	return res.status(200).json({ status: "success", message: "Successfully retrieved guild info", data: data } as ResponseProps);
 });
-app.get("/discord-test", async (req, res) => {
-	const channel = await client.channels.fetch(giveawayChannelId);
-	if (channel && channel.isTextBased() && channel.isSendable()) channel.send({ content: "Testing a ping message" });
-
-	return res.status(200).json({ status: "success", statusCode: 200, message: "Successfully sent test message" } as ResponseProps);
-});
 app.get("/verify-admin-role/:discordId", async (req, res) => {
 	try {
 		const discordId = req.params.discordId;
@@ -99,12 +93,12 @@ app.get("/verify-admin-role/:discordId", async (req, res) => {
 		return res.status(500).json({ status: "error", statusCode: 500, message: "An error has occurred while trying to verify admin role" });
 	}
 });
-app.get("/assign-winner/:giveawayId", async (req, res) => {
+app.get("/get-winner/:giveawayId", async (req, res) => {
 	const giveawayId = req.params.giveawayId;
 	const participants = await ParticipantService.getByGiveawayId(+giveawayId);
 	const winnerSelection = Math.floor(Math.random() * participants.length);
-	const winner = await client.users.fetch(participants[winnerSelection].discordId);
-	return res.status(200).json({ status: "success", statusCode: 200, data: { user: { id: winner.id } } } as ResponseProps);
+	const winner = participants[winnerSelection];
+	return res.status(200).json({ status: "success", statusCode: 200, data: { user: { id: winner.discordId } } } as ResponseProps);
 });
 app.listen(process.env.SERVER_PORT || 3001, () => {
 	console.log("Express server listening on 3001");
