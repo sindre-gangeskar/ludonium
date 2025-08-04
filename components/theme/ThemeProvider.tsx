@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
 	const theme = useTheme();
 	const customTheme = extendTheme({
-		fontFamily: { body: "var(--font-noto-sans)" },
+		fontFamily: { body: "var(--font-funnel-sans)" },
 		typography: {
-			h1: { fontFamily: "var(--font-comfortaa)" },
-			h2: { fontFamily: "var(--font-comfortaa)", fontWeight: 900 },
-			h3: { fontFamily: "var(--font-comfortaa)", fontWeight: 900 },
-			h4: { fontFamily: "var(--font-comfortaa)", fontWeight: 900 },
+			h1: { fontFamily: "var(--font-rem)" },
+			h2: { fontFamily: "var(--font-rem)", fontWeight: 900 },
+			h3: { fontFamily: "var(--font-rem)", fontWeight: 900 },
+			h4: { fontFamily: "var(--font-rem)", fontWeight: 900 },
 		},
 		colorSchemes: {
 			dark: {
@@ -46,7 +46,6 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 					root: {
 						borderRadius: "1.5rem",
 						transition: "background-color 250ms ease, color 250ms ease",
-						fontFamily: "var(--font-noto-sans)",
 					},
 				},
 			},

@@ -7,14 +7,6 @@ import { capitalizeString, getColorFromHexToInt, parseClientPrismaError } from "
 
 const discordServerURL = process.env.DISCORD_SERVER_URL;
 export default class DiscordService {
-	static async test() {
-		try {
-			return await axios.get(`${discordServerURL}/discord-test`, { headers: { "Content-Type": "application/json" } });
-		} catch (error) {
-			console.error(error);
-			throw { status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while running test function" } } as ResponseProps;
-		}
-	}
 	static async getGuildData() {
 		try {
 			return await axios.get(`${discordServerURL}/get-guild-info`, { headers: { "Content-Type": "application/json" } });
@@ -33,6 +25,14 @@ export default class DiscordService {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "giveaway");
 			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An in internal server error has occurred while creating giveaway" } } as ResponseProps);
+		}
+	}
+	static async validateDiscordGuildMembership(discordId: string) {
+		try {
+			return await axios.get(`${discordServerURL}/validate-guild-membership/${discordId}`);
+		} catch (error) {
+			console.error(error);
+			throw { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to retrieve guild membership data", errors: {"guild": "Failed to retrieve guild membership data"} } as ResponseProps;
 		}
 	}
 	static async getRoles() {

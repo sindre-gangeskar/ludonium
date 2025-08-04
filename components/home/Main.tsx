@@ -32,7 +32,7 @@ export default function Main() {
 				{status == "authenticated" ? (
 					<Stack gap={1}>
 						<Typography level="title-md" sx={{ mx: "auto" }}>
-							If this sounds interesting, click on the button below to start the donation process!
+							Click on the button below if you would like to make a donation.
 						</Typography>
 						<Button size="lg" sx={{ maxWidth: "fit-content", mx: "auto" }} variant="solid" color="primary" component={Link} href="/donate">
 							Take me to the donation page

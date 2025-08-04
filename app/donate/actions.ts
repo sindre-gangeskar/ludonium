@@ -3,6 +3,7 @@ import PlatformService from "@/lib/services/PlatformService";
 import DonationService from "@/lib/services/DonationService";
 import { PlatformProps, RegionProps, ResponseProps } from "@/lib/definitions";
 import RegionService from "@/lib/services/RegionService";
+import DiscordService from "@/lib/services/DiscordService";
 
 export async function getAllPlatforms() {
 	try {
@@ -24,8 +25,13 @@ export async function getAllRegions() {
 
 export async function submitDonation(_state: ResponseProps | null, formdata: FormData) {
 	try {
-		await DonationService.create(formdata);
-		return { status: "success", statusCode: 201, message: "Successfully created donation" } as ResponseProps;
+		const discordId = String(formdata.get("discordId"));
+		if (!discordId) return { status: "fail", statusCode: 400, message: "Failed to retrieve discord id" } as ResponseProps;
+		const response = await DiscordService.validateDiscordGuildMembership(discordId);
+		if (response && response.data.status === "success") {
+			await DonationService.create(formdata);
+			return { status: "success", statusCode: 201, message: "Successfully created donation" } as ResponseProps;
+		} else return response.data;
 	} catch (error) {
 		return error as ResponseProps;
 	}

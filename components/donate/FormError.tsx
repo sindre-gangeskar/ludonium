@@ -1,17 +1,27 @@
 "use client";
+import { ResponseProps } from "@/lib/definitions";
 import { useGSAP } from "@gsap/react";
 import { Card, CardContent, Typography } from "@mui/joy";
+import { TypographyProps } from "@mui/joy";
 import gsap from "gsap";
-export default function FormError() {
+export default function FormError({ state }: { state: ResponseProps }) {
 	useGSAP(() => {
-		gsap.set("#thank-you", { opacity: 0, y: -80 });
-		gsap.to("#thank-you", { opacity: 1, y: 0, duration: 1.2, ease: "back.out" });
+		gsap.set("#error", { opacity: 0, y: -80 });
+		gsap.to("#error", { opacity: 1, y: 0, duration: 1.2, ease: "back.out" });
 	});
+	const titleTypographyProps: TypographyProps = { textAlign: "center", level: "title-lg" };
+
 	return (
-		<Card id="thank-you" color="danger" variant="solid" invertedColors sx={{ maxWidth: "md", mx: "auto", my: 5 }}>
+		<Card size="lg" id="error" color="danger" variant="solid" sx={{ maxWidth: "sm", mx: "auto", my: 5 }}>
 			<CardContent>
-				<Typography level="h3">Uh oh! An unexpected error has occurred!</Typography>
-				<Typography level="title-md">Please contact the moderators or admins of the server for help.</Typography>
+				{state.status === "error" && (
+					<>
+						<Typography {...titleTypographyProps}>Uh oh! Something unexpected has occurred</Typography>
+						{state.status === "error" && state?.message && <Typography textAlign={"center"}>{state.message}</Typography>}
+					</>
+				)}
+
+				{state.status === "fail" && state?.errors?.discordMembership && <Typography {...titleTypographyProps}>{state.errors.discordMembership}</Typography>}
 			</CardContent>
 		</Card>
 	);

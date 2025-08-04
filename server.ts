@@ -100,6 +100,18 @@ app.get("/get-winner/:giveawayId", async (req, res) => {
 	const winner = participants[winnerSelection];
 	return res.status(200).json({ status: "success", statusCode: 200, data: { user: { id: winner.discordId } } } as ResponseProps);
 });
+app.get("/validate-guild-membership/:discordId", async (req, res) => {
+	try {
+		const discordId = req.params.discordId;
+		const guild = await client.guilds.fetch(guildId);
+		const isMember = (await guild.members.list()).some(user => user.id === discordId);
+		if (!isMember) return res.status(404).json({ status: "fail", statusCode: 404, message: "Discord user could not be found in the guild", errors: {"discordMembership": "You are currently not a member of the guild."} } as ResponseProps);
+		return res.status(200).json({ status: "success", statusCode: 200, message: "Discord user successfully found in the guild" } as ResponseProps);
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ status: "error", statusCode: 500, message: "An internal server error has occurred while checking discord user guild membership" } as ResponseProps);
+	}
+});
 app.listen(process.env.SERVER_PORT || 3001, () => {
 	console.log("Express server listening on 3001");
 });

@@ -12,18 +12,15 @@ export default function FormSuccess({ onClick }: { onClick: MouseEventHandler<HT
 	return (
 	<Card size="lg" id="thank-you" color="neutral" variant="soft" sx={{ maxWidth: "md", mx: "auto", my: 5 }}>
 		<CardContent>
-			<Typography level="h3">Thank you so much!</Typography>
-			<Typography level="title-md">This generous donation does not go unnoticed.</Typography>
-			<Typography color="warning" level="title-sm">
-				The donation is awaiting approval by a moderator.
-			</Typography>
+			<Typography level="h2">Thank you!</Typography>
+			<Typography level="title-md" color="warning">This generous donation does not go unnoticed.</Typography>
 		</CardContent>
 		<CardActions sx={{ justifyContent: "center" }}>
 			<Button onClick={onClick} variant="solid" color="primary">
-				Donate a game
+				Donate another game
 			</Button>
 			<Button component={Link} href="/stats" variant="solid" color="secondary">
-				View donation stats
+				Check your donation stats
 			</Button>
 		</CardActions>
 	</Card>

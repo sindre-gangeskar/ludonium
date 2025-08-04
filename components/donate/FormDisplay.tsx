@@ -61,7 +61,7 @@ export default function FormDisplay({ platforms, platformTypes, regions }: { pla
 		setFormState(state);
 	}, [state]);
 
-	if (formState?.status === "error") return <FormError />;
+	if (formState?.status === "error") return <FormError state={state} />;
 
 	return platforms.length && platformTypes.length > 0 ? (
 		formState?.status === "success" ? (
@@ -187,12 +187,13 @@ export default function FormDisplay({ platforms, platformTypes, regions }: { pla
 					</Card>
 
 					{/* Submission */}
-					<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="soft" color="neutral">
+					<Card className="input-card" size="lg" sx={{ ...cardSx }} variant="outlined" color="danger">
+						<StateMessage state={state} errorKey="discordMembership" prioritize={["fail"]}></StateMessage>
 						<CardContent>
 							<FormTerms id={"terms"} />
 						</CardContent>
 						<CardActions>
-							<Checkbox sx={{ mx: "auto", flex: 1 }} label={"I agree to these terms"} onChange={updateAgreementState}></Checkbox>
+							<Checkbox  sx={{ mx: "auto", flex: 1 }} label={"I agree to these terms"} onChange={updateAgreementState}></Checkbox>
 							<Button loading={isPending} sx={{ flex: 1 }} type="submit" size="lg" disabled={!agreed} color="primary">
 								Submit donation
 							</Button>
@@ -206,7 +207,7 @@ export default function FormDisplay({ platforms, platformTypes, regions }: { pla
 			<CardContent>
 				<Typography level="title-md">Donations are currently unavailable.</Typography>
 				<Typography level="title-sm" color="warning">
-					Please contact the moderators or admins on the discord server.
+					Please contact the moderators or admins on the discord server for help.
 				</Typography>
 			</CardContent>
 		</Card>

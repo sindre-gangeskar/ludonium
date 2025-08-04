@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Comfortaa, Geist, Geist_Mono, Noto_Sans, Noto_Sans_Display } from "next/font/google";
+import { Geist, Geist_Mono, REM, Funnel_Sans } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/theme/ThemeProvider";
 import { Container } from "@mui/joy";
@@ -17,18 +17,14 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
-const comfortaa = Comfortaa({
-	variable: "--font-comfortaa",
-	subsets: ["latin"],
-});
 
-const notoSans = Noto_Sans({
-	variable: "--font-noto-sans",
-	subsets: ["latin"],
-});
+const funnelSans = Funnel_Sans({
+	variable: '--font-funnel-sans',
+	subsets: [ 'latin' ]
+})
 
-const notoSansDisplay = Noto_Sans_Display({
-	variable: "--font-noto-sans-display",
+const rem = REM({
+	variable: "--font-rem",
 	subsets: ["latin"],
 });
 
@@ -47,7 +43,7 @@ export default function RootLayout({
 			<head>
 				<link rel="icon" type="image/svg+xml" href="/icon.svg"></link>
 			</head>
-			<body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} ${notoSans.variable} ${notoSansDisplay.variable} antialiased`}>
+			<body className={`${geistSans.variable} ${geistMono.variable} ${rem.variable} ${funnelSans.variable} antialiased`}>
 				<SessionProvider>
 					<ThemeProvider>
 						<Navbar />
