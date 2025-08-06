@@ -1,18 +1,12 @@
 import express from "express";
 import client from "./bot";
 import { DiscordEmbedProps, DiscordMessageProps, ResponseProps } from "./lib/definitions";
-import { capitalizeString, getColorFromHexToInt, getGiveawayDurationInLocaleString } from "./lib/utils";
+import { capitalizeString, getColorFromHexToInt, getDiscordVariables, getGiveawayDurationInLocaleString } from "./lib/utils";
 
 import GiveawayService from "./lib/services/GiveawayService";
 import ParticipantService from "./lib/services/ParticipantService";
 
-const giveawayChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_ID?.toString().trim();
-const guildId = process.env.DISCORD_GUILD_ID?.toString().trim();
-const adminRoleId = process.env.DISCORD_ADMIN_ROLE_ID?.toString().trim();
-
-if (!giveawayChannelId) throw new Error("Missing DISCORD_GIVEAWAY_CHANNEL_ID environment variable");
-if (!guildId) throw new Error("Missing DISCORD_GUILD_ID environment variable");
-if (!adminRoleId) throw new Error("Missing DISCORD_ADMIN_ROLE_ID environment variable");
+const { guildId, adminRoleId, giveawayChannelId } = getDiscordVariables();
 
 const app = express();
 
@@ -36,6 +30,7 @@ app.post("/create-giveaway", async (req, res, next) => {
 					{ name: "Platform", value: capitalizeString(donation.platform.name) },
 					{ name: "Region", value: donation.region.name.toUpperCase() },
 					{ name: "Giveaway Ends", value: dateString },
+					{ name: "Social Permissions", value: "You **must** enable the option to allow other server members to send you a DM in **Social Permissions** in order to be able to receive the key upon winning." },
 					{
 						name: "Privacy Notice",
 						value: `By reacting to this giveaway, you consent to the registration of you as a participant by storing your **Discord ID** as a way to recognize you as a participant.
@@ -63,7 +58,7 @@ app.post("/send-winner-dm/:discordId", async (req, res, next) => {
 		const { body } = req;
 		const discordId = req.params.discordId;
 
-		const discordUser = await client.users.fetch(discordId);
+		const discordUser = await client.users.fetch(discordId, { force: true });
 		if (!discordId || !discordUser) throw new Error("Unable to find Discord User with provided id");
 
 		const dmChannel = await discordUser.createDM(true);
@@ -73,6 +68,17 @@ app.post("/send-winner-dm/:discordId", async (req, res, next) => {
 		return res.json({ status: "success", statusCode: 200, message: "Successfully sent dm to winner" } as ResponseProps);
 	} catch (error) {
 		console.error(error);
+
+		if (error && typeof error === "object" && "code" in error) {
+			switch (error.code) {
+				case 50007: {
+					console.log("Failed to send DM to winner - missing permissions");
+				}
+				default:
+					break;
+			}
+		}
+
 		next();
 	}
 });
@@ -104,8 +110,12 @@ app.get("/validate-guild-membership/:discordId", async (req, res) => {
 	try {
 		const discordId = req.params.discordId;
 		const guild = await client.guilds.fetch(guildId);
-		const isMember = (await guild.members.list()).some(user => user.id === discordId);
-		if (!isMember) return res.status(404).json({ status: "fail", statusCode: 404, message: "Discord user could not be found in the guild", errors: {"discordMembership": "You are currently not a member of the guild."} } as ResponseProps);
+		const membersList = await guild.members.fetch();
+		const isMember = membersList?.some(user => user.id === discordId);
+		if (!isMember)
+			return res
+				.status(404)
+				.json({ status: "fail", statusCode: 404, message: "Discord user could not be found in the guild", errors: { discordMembership: "You are currently not a member of the guild." } } as ResponseProps);
 		return res.status(200).json({ status: "success", statusCode: 200, message: "Discord user successfully found in the guild" } as ResponseProps);
 	} catch (error) {
 		console.error(error);

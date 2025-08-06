@@ -1,25 +1,25 @@
 import { Client, GatewayIntentBits, Partials } from "discord.js";
 import GiveawayService from "./lib/services/GiveawayService";
 import ParticipantService from "./lib/services/ParticipantService";
-import { isGiveawayExpired } from "./lib/utils";
+import { getDiscordVariables, isGiveawayExpired } from "./lib/utils";
 
-const token = process.env.DISCORD_BOT_TOKEN;
-if (!token) throw new Error("Missing Discord Bot Token environment variable");
+const { token, giveawayChannelId } = getDiscordVariables();
+
 
 const client = new Client({
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessageReactions],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessageReactions],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User],
 });
 
 client.on("ready", async () => {
 	console.log("Discord Bot is ready");
-	await checkGiveawaysInterval(15);
+	await checkGiveawaysInterval(10);
 });
 client.login(token);
 
 client.on("messageReactionAdd", async (reaction, user) => {
 	try {
-		if (reaction && reaction.message.id) {
+		if (reaction && reaction.message.id && reaction.message.channelId === giveawayChannelId) {
 			const messageId = reaction.message.id;
 			const giveaway = await GiveawayService.getByMessageId(messageId);
 
@@ -34,7 +34,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 });
 client.on("messageReactionRemove", async (reaction, user) => {
 	try {
-		if (reaction && reaction.message.id) {
+		if (reaction && reaction.message.id && reaction.message.channelId === giveawayChannelId) {
 			const giveaway = await GiveawayService.getByMessageId(reaction.message.id);
 
 			if (giveaway && reaction.message.id === giveaway.messageId) {
@@ -43,7 +43,12 @@ client.on("messageReactionRemove", async (reaction, user) => {
 
 				for (const [, reaction] of message.reactions.cache) {
 					const reacted = await reaction.users.fetch().then(users => users.has(user.id));
-					if (reacted) await reaction.users.remove(user.id);
+					
+					if (reacted) {
+						/* Delay removal action to help soften bot action rate-limiting */
+						await new Promise(resolve => setTimeout(resolve, 1000));
+						await reaction.users.remove(user.id);
+					}
 				}
 			}
 		}

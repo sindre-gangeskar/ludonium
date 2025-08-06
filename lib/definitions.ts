@@ -66,7 +66,7 @@ export interface GenericErrorProps {
 
 export interface ResponseProps<T = unknown> {
 	status: "success" | "error" | "fail";
-	statusCode: 200 | 201 | 400 | 401 | 404 | 409 | 500;
+	statusCode: 200 | 201 | 400 | 401 | 403 | 404 | 409 | 500;
 	message?: string;
 	errors?: DonationFormErrorProps | GenericErrorProps;
 	data?: T;

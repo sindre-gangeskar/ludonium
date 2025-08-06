@@ -110,3 +110,20 @@ export function isGiveawayExpired(giveawayDuration: Date) {
 	const endDate = new Date(giveawayDuration).toISOString();
 	return now > endDate;
 }
+export function getDiscordVariables() {
+	const guildId = process.env.DISCORD_GUILD_ID;
+	const giveawayChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_ID;
+	const token = process.env.DISCORD_BOT_TOKEN;
+	const serverUrl = process.env.DISCORD_SERVER_URL;
+	const adminRoleId = process.env.DISCORD_ADMIN_ROLE_ID;
+	const giveawayLogChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_LOG_ID;
+
+	if (!guildId) throw new Error("Missing DISCORD_GUILD_ID environment variable");
+	if (!giveawayChannelId) throw new Error("Missing DISCORD_GIVEAWAY_CHANNEL_ID");
+	if (!token) throw new Error("Missing DISCORD_BOT_TOKEN environemnt variable");
+	if (!serverUrl) throw new Error("Missing DISCORD_SERVER_URL environment variable");
+	if (!adminRoleId) throw new Error("Missing DISCORD_ADMIN_ROLE_ID environment variable");
+	if (!giveawayLogChannelId)
+		console.warn("Missing DISCORD_GIVEAWAY_CHANNEL_LOG_ID environment variable. In order to log issues that occur, it is recommended to have a dedicated channel for logging giveaway issues.");
+	return { guildId, giveawayChannelId, token, serverUrl, adminRoleId, giveawayLogChannelId };
+}
