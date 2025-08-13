@@ -1,11 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express from "express";
 import client from "./bot";
 import { DiscordEmbedProps, DiscordMessageProps, ResponseProps } from "./lib/definitions";
-import { capitalizeString, getColorFromHexToInt, getDiscordVariables, getGiveawayDurationInLocaleString } from "./lib/utils";
+import { capitalizeString, getColorFromHexToInt, getDiscordVariables, getGiveawayDurationInLocaleString } from "./lib/serverUtils";
 
 import GiveawayService from "./lib/services/GiveawayService";
-import ParticipantService from "./lib/services/ParticipantService";
-
 const { guildId, adminRoleId, giveawayChannelId } = getDiscordVariables();
 
 const app = express();
@@ -68,17 +68,6 @@ app.post("/send-winner-dm/:discordId", async (req, res, next) => {
 		return res.json({ status: "success", statusCode: 200, message: "Successfully sent dm to winner" } as ResponseProps);
 	} catch (error) {
 		console.error(error);
-
-		if (error && typeof error === "object" && "code" in error) {
-			switch (error.code) {
-				case 50007: {
-					console.log("Failed to send DM to winner - missing permissions");
-				}
-				default:
-					break;
-			}
-		}
-
 		next();
 	}
 });
@@ -98,13 +87,6 @@ app.get("/verify-admin-role/:discordId", async (req, res) => {
 		console.error(error);
 		return res.status(500).json({ status: "error", statusCode: 500, message: "An error has occurred while trying to verify admin role" });
 	}
-});
-app.get("/get-winner/:giveawayId", async (req, res) => {
-	const giveawayId = req.params.giveawayId;
-	const participants = await ParticipantService.getByGiveawayId(+giveawayId);
-	const winnerSelection = Math.floor(Math.random() * participants.length);
-	const winner = participants[winnerSelection];
-	return res.status(200).json({ status: "success", statusCode: 200, data: { user: { id: winner.discordId } } } as ResponseProps);
 });
 app.get("/validate-guild-membership/:discordId", async (req, res) => {
 	try {

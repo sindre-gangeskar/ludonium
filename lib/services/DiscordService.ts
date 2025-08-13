@@ -3,7 +3,8 @@ import { DiscordEmbedProps, ResponseProps } from "../definitions";
 import DonationService from "./DonationService";
 import GiveawayService from "./GiveawayService";
 
-import { capitalizeString, getColorFromHexToInt, getDiscordVariables, parseClientPrismaError } from "../utils";
+import { capitalizeString, decrypt, getColorFromHexToInt, getDiscordVariables, parseClientPrismaError, parseDiscordError } from "../serverUtils";
+import KeyService from "./KeyService";
 
 const { serverUrl } = getDiscordVariables();
 export default class DiscordService {
@@ -33,11 +34,18 @@ export default class DiscordService {
 			return result;
 		} catch (error) {
 			console.error(error);
-			throw { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to retrieve guild membership data", errors: {"guild": "Failed to retrieve guild membership data"} } as ResponseProps;
+			throw {
+				status: "error",
+				statusCode: 500,
+				message: "An internal server error has occurred while trying to retrieve guild membership data",
+				errors: { guild: "Failed to retrieve guild membership data" },
+			} as ResponseProps;
 		}
 	}
-	static async sendGiveawayWinDM(discordId: string, key: string, platform: string, region: string) {
+	static async sendGiveawayWinDM(discordId: string, keyId: number, platform: string, region: string, giveawayId: number) {
 		try {
+			const key = await KeyService.getById(keyId);
+			const decrypted = decrypt(key.key, key.iv, key.authTag);
 			const embed: DiscordEmbedProps = {
 				title: "Congratulations!",
 				description: "You've won a donated game key giveaway!",
@@ -45,14 +53,16 @@ export default class DiscordService {
 				fields: [
 					{ name: "Platform", value: capitalizeString(platform) },
 					{ name: "Region", value: region.toUpperCase() },
-					{ name: "Key", value: key.toUpperCase() },
+					{ name: "Key", value: decrypted.toUpperCase() },
 				],
 			};
 			const body = { embeds: [embed] };
+
 			return await axios.post(`${serverUrl}/send-winner-dm/${discordId}`, body);
 		} catch (error) {
 			console.error(error);
-			throw { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to send giveaway winner dm" } as ResponseProps;
+			const discordError = await parseDiscordError(error, giveawayId);
+			throw discordError ?? ({ status: "error", statusCode: 500, message: "An internal server error has occurred while trying to send giveaway winner dm" } as ResponseProps);
 		}
 	}
 }

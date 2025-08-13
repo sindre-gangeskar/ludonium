@@ -1,6 +1,6 @@
 import { ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { encrypt, generateKeyHash, parseClientPrismaError } from "../utils";
+import { encrypt, generateKeyHash, parseClientPrismaError } from "../serverUtils";
 export default class KeyService {
 	static async create(key: string, platformId: number) {
 		try {
@@ -15,7 +15,7 @@ export default class KeyService {
 	}
 	static async getById(id: number) {
 		try {
-			return await prisma.key.findFirst({ where: { id: id }, include: { Platform: true } });
+			return await prisma.key.findFirstOrThrow({ where: { id: id }, include: { Platform: true } });
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "key");

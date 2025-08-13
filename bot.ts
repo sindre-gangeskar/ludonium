@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits, Partials } from "discord.js";
 import GiveawayService from "./lib/services/GiveawayService";
 import ParticipantService from "./lib/services/ParticipantService";
-import { getDiscordVariables, isGiveawayExpired } from "./lib/utils";
+import { getDiscordVariables, isGiveawayExpired } from "./lib/serverUtils";
 
 const { token, giveawayChannelId } = getDiscordVariables();
 

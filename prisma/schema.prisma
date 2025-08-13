@@ -58,12 +58,13 @@ model Donation {
 model Giveaway {
   id              Int           @id @default(autoincrement())
   statusId        Int
-  donation        Donation?     
+  donation        Donation?
   status          Status        @relation(fields: [statusId], references: [id])
   messageId       String?
   winnerDiscordId String?
   duration        DateTime
   participant     Participant[]
+  giveawayLog     GiveawayLog[]
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -86,6 +87,17 @@ model Status {
   giveaway Giveaway[]
 
   @@map("statuses")
+}
+
+model GiveawayLog {
+  id         Int      @id @default(autoincrement())
+  log        String
+  giveawayId Int
+  giveaway   Giveaway @relation(fields: [giveawayId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("giveaway_logs")
 }
 
 model Platform {

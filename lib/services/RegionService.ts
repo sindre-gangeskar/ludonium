@@ -1,6 +1,6 @@
 import { ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { parseClientPrismaError } from "../utils";
+import { parseClientPrismaError } from "../serverUtils";
 export default class RegionService {
 	static async getAll(order?: "asc" | "desc") {
 		try {

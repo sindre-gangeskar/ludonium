@@ -17,11 +17,10 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
-
 const funnelSans = Funnel_Sans({
-	variable: '--font-funnel-sans',
-	subsets: [ 'latin' ]
-})
+	variable: "--font-funnel-sans",
+	subsets: ["latin"],
+});
 
 const rem = REM({
 	variable: "--font-rem",
@@ -41,6 +40,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>
+				<noscript>JavaScript must be enabled in order to use this website.</noscript>
 				<link rel="icon" type="image/svg+xml" href="/icon.svg"></link>
 			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} ${rem.variable} ${funnelSans.variable} antialiased`}>

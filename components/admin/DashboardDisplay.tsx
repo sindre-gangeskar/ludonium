@@ -32,6 +32,7 @@ export default function DashboardDisplay({ count: { pc, console } }: { count: { 
 									Start PC Game Giveaway
 								</Button>
 								<StateMessage state={pcState} errorKey="pc" prioritize={["success"]} />
+								<StateMessage state={pcState} errorKey="pc" prioritize={["fail", "error"]} />
 							</Box>
 
 							<Box component={"form"} action={consoleDispatch}>
@@ -39,10 +40,9 @@ export default function DashboardDisplay({ count: { pc, console } }: { count: { 
 									Start Console Game Giveaway
 								</Button>
 								<StateMessage state={consoleState} errorKey="console" prioritize={["success"]} />
+								<StateMessage state={consoleState} errorKey="console" prioritize={["fail", "error"]} />
 							</Box>
 						</Stack>
-						<StateMessage state={pcState} errorKey="pc" prioritize={["fail", "error"]} />
-						<StateMessage state={consoleState} errorKey="console" prioritize={["fail", "error"]} />
 					</Stack>
 				</CardContent>
 			</Card>

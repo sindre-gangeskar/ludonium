@@ -1,7 +1,6 @@
 import { DonationProps, PlatformProps, PlatformTypeProps, ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { isKeyValid, parseClientPrismaError } from "../utils";
-import GiveawayService from "./GiveawayService";
+import { isKeyValid, parseClientPrismaError } from "../serverUtils";
 import DiscordService from "./DiscordService";
 import KeyService from "./KeyService";
 
@@ -61,11 +60,10 @@ export default class DonationService {
 	}
 	static async getByPlatformType(platformType: PlatformTypeProps["name"]) {
 		try {
-			const donations = await prisma.donation.findMany({ where: { platformType: { name: platformType }, giveawayId: null } });
-			return donations;
+			return await prisma.donation.findMany({ where: { platformType: { name: platformType }, giveawayId: null } });
 		} catch (error) {
 			console.error(error);
-			const prismaError = await parseClientPrismaError(error, "donations");
+			const prismaError = parseClientPrismaError(error, "donations");
 			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to retrieve donations by platform" } } as ResponseProps);
 		}
 	}
@@ -82,18 +80,20 @@ export default class DonationService {
 	}
 	static async assignGiveawayId(id: number, giveawayId: number) {
 		try {
-			const giveaway = await GiveawayService.getById(giveawayId);
-			await prisma.donation.update({ where: { id: id }, data: { giveawayId: giveaway.id } });
+			await prisma.$transaction(async tx => {
+				const giveaway = await tx.giveaway.findUniqueOrThrow({ where: { id: giveawayId } });
+				await tx.donation.update({ where: { id: id }, data: { giveawayId: giveaway.id } });
+			});
 			return { status: "success", statusCode: 200, message: "Successfully assigned giveaway id to donation" } as ResponseProps;
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "donations");
-			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while assigning a giveaway id to donation" } } as ResponseProps);
+			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { giveaway: "An internal server error has occurred while assigning a giveaway id to donation" } } as ResponseProps);
 		}
 	}
 	static async getByGiveawayId(id: number) {
 		try {
-			return await prisma.donation.findFirst({ where: { giveawayId: id }, include: { key: true, platform: true, region: true } });
+			return await prisma.donation.findUniqueOrThrow({ where: { giveawayId: id }, include: { key: true, platform: true, region: true } });
 		} catch (error) {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "donations");
@@ -127,11 +127,10 @@ async function validateForm(formdata: FormData) {
 		accumulatedErrors = { ...accumulatedErrors, platformId: "platformId is required and must be a number" };
 	}
 	if (!numberRegex.test(data.regionId)) {
-		accumulatedErrors = { ...accumulatedErrors, platformId: "platformId is required and must be a number" };
+		accumulatedErrors = { ...accumulatedErrors, regionId: "regionId is required and must be a number" };
 	}
 	if (data.key && !isKeyValid(platform.name as PlatformProps["name"], data.key.toString())) {
 		accumulatedErrors = { ...accumulatedErrors, key: `Invalid ${platform.name} key format` };
 	}
-	console.error(accumulatedErrors);
 	return Object.keys(accumulatedErrors).length > 0 ? { errors: accumulatedErrors, success: false, data: data } : { data, success: true };
 }

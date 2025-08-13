@@ -12,7 +12,7 @@ export interface RegionProps {
 
 export interface StatusProps {
 	id?: number;
-	name: string;
+	name: "success" | "failed" | "inactive" | "active";
 }
 
 export interface PlatformTypeProps {
@@ -29,6 +29,8 @@ export interface DonationProps {
 
 export interface KeyProps {
 	key: string;
+	authTag: string;
+	iv: string;
 	discordId: string;
 }
 

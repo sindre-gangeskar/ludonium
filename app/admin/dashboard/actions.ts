@@ -26,6 +26,8 @@ export async function createConsoleGiveaway() {
 		return { status: "success", statusCode: 200, message: "Successfully created Console giveaway" } as ResponseProps;
 	} catch (error) {
 		console.error(error);
+		const parsedError = error as ResponseProps;
+		if (parsedError.statusCode === 404) return { status: "fail", statusCode: 404, errors: { console: "Could not initialize giveaway - no console donations available" } } as ResponseProps;
 		return error as ResponseProps;
 	}
 }
@@ -36,6 +38,8 @@ export async function createPCGiveaway() {
 		return { status: "success", statusCode: 200, message: "Successfully created PC giveaway" } as ResponseProps;
 	} catch (error) {
 		console.error(error);
+		const parsedError = error as ResponseProps;
+		if (parsedError.statusCode === 404) return { status: "fail", statusCode: 404, errors: { pc: "Could not initialize giveaway - no pc donations available" } } as ResponseProps;
 		return error as ResponseProps;
 	}
 }
