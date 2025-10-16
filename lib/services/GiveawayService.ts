@@ -3,9 +3,8 @@ import DiscordService from "./DiscordService";
 import DonationService from "./DonationService";
 import { MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js";
 import { PlatformTypeProps, ResponseProps, StatusProps } from "../definitions";
-import { getGiveawayDurationInDateTime, parseClientPrismaError } from "../utils/server";
+import { getGiveawayDurationInDateTime, isGiveawayExpired, parseClientPrismaError } from "../utils/server";
 import { getDiscordVariables } from "../utils/server";
-import { isGiveawayExpired } from "../utils/server";
 const { giveawayDuration } = getDiscordVariables();
 export default class GiveawayService {
 	static async create(donationId: number) {
@@ -167,16 +166,11 @@ export default class GiveawayService {
 	}
 	static async addParticipant(discordMessageId: string, user: User | PartialUser, reaction: MessageReaction | PartialMessageReaction) {
 		try {
-			const giveaway = await GiveawayService.getByMessageId(discordMessageId);
-			if (!giveaway || (giveaway && isGiveawayExpired(giveaway.duration))) {
-				reaction.users.remove(user.id);
-				return;
-			}
-
 			return await prisma.$transaction(async tx => {
-				const giveaway = await tx.giveaway.findFirstOrThrow({ where: { messageId: discordMessageId } });
-				const participant = await tx.participant.create({ data: { giveawayId: giveaway.id, discordId: user.id } })
-				return { giveaway, participant };
+				const giveaway = await tx.giveaway.findFirst({ where: { messageId: discordMessageId } });
+				if (giveaway && !isGiveawayExpired(giveaway.duration))
+					await tx.participant.upsert({ where: { discordId_giveawayId: { discordId: user.id, giveawayId: giveaway.id } }, create: { discordId: user.id, giveawayId: giveaway.id }, update: { discordId: user.id, giveawayId: giveaway.id } })
+				else await reaction.users.remove(user.id);
 			})
 		} catch (error) {
 			const prismaError = parseClientPrismaError(error, 'Giveaway | Participant');

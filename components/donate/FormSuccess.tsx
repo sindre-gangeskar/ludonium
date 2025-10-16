@@ -1,7 +1,6 @@
 "use client";
 import { useGSAP } from "@gsap/react";
 import { Button, Card, CardActions, CardContent, Typography } from "@mui/joy";
-import Link from "next/link";
 import gsap from "gsap";
 import { MouseEventHandler } from "react";
 export default function FormSuccess({ onClick }: { onClick: MouseEventHandler<HTMLAnchorElement> }) {
@@ -18,9 +17,6 @@ export default function FormSuccess({ onClick }: { onClick: MouseEventHandler<HT
 		<CardActions sx={{ justifyContent: "center" }}>
 			<Button onClick={onClick} variant="solid" color="primary">
 				Donate another game
-			</Button>
-			<Button component={Link} href="/stats" variant="solid" color="secondary">
-				Check your donation stats
 			</Button>
 		</CardActions>
 	</Card>

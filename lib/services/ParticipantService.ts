@@ -7,7 +7,6 @@ export default class ParticipantService {
 	static async create(giveawayId: number, discordId: string) {
 		try {
 			const giveaway = await GiveawayService.getById(giveawayId);
-
 			if (giveaway && (giveaway.status.name === "active" && !isGiveawayExpired(giveaway.duration))) {
 				return await prisma.participant.upsert({
 					where: { discordId_giveawayId: { discordId, giveawayId } },

@@ -4,9 +4,9 @@ import express from "express";
 import client from "./bot";
 import { DiscordEmbedProps, DiscordMessageProps, ResponseProps } from "./lib/definitions";
 import { capitalizeString, getColorFromHexToInt, getDiscordVariables, getGiveawayDurationInLocaleString } from "./lib/utils/server";
+import GiveawayService from './lib/services/GiveawayService';
 
-const { guildId, adminRoleId, giveawayChannelId } = getDiscordVariables();
-
+const { guildId, adminRoleId, giveawayChannelId, giveawayEmoji } = getDiscordVariables();
 const app = express();
 
 app.use(express.json());
@@ -39,19 +39,19 @@ app.post("/create-giveaway", async (req, res, next) => {
 				footer: { text: "NOTE: Adding multiple reactions will NOT increase your chances at winning." },
 			};
 			const body: DiscordMessageProps = { embeds: [ embed ] };
-			const emoji = "👍";
-			const message = await channel.send(body);
-			if (message)
-				await message.react(emoji);
+			const sentMessage = await channel.send(body);
+			await GiveawayService.updateById(giveaway.id, sentMessage.id);
+			await sentMessage.react(giveawayEmoji);
 			return res.status(200).json({ message: "Successfully sent giveaway from bot service", statusCode: 200 });
 		}
+		else next();
 	} catch (error) {
 		if (error && typeof error === "object" && "code" in error && "message" in error) {
 			console.error(error.message);
 		} else {
 			console.error(error);
 		}
-		next(error);
+		next();
 	}
 });
 app.post("/send-winner-dm/:discordId", async (req, res, next) => {

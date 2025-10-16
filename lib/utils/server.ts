@@ -136,9 +136,9 @@ export function getDiscordVariables() {
 	const serverUrl = process.env.DISCORD_SERVER_URL;
 	const adminRoleId = process.env.DISCORD_ADMIN_ROLE_ID;
 	const giveawayLogChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_LOG_ID;
-	const giveawayEmoji = decodeURI(process.env.DISCORD_GIVEWAY_EMOJI_ID ?? "");
+	const giveawayEmoji = decodeURI(process.env.DISCORD_GIVEAWAY_EMOJI ?? "");
 	const giveawayDuration = process.env.DISCORD_GIVEAWAY_DURATION;
-	if (!giveawayEmoji) throw new Error('Missing DISCORD_GIVEAWAY_EMOJI_ID environment variable');
+	if (!giveawayEmoji) throw new Error('Missing DISCORD_GIVEAWAY_EMOJI environment variable');
 	if (!guildId) throw new Error("Missing DISCORD_GUILD_ID environment variable");
 	if (!giveawayChannelId) throw new Error("Missing DISCORD_GIVEAWAY_CHANNEL_ID");
 	if (!token) throw new Error("Missing DISCORD_BOT_TOKEN environment variable");
