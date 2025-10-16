@@ -1,11 +1,11 @@
-import { PlatformProps, ResponseProps } from "./definitions";
+import { PlatformProps, ResponseProps } from "../definitions";
 import crypto from "crypto";
-import GiveawayService from "./services/GiveawayService";
+import GiveawayService from "../services/GiveawayService";
 
 const secretToken = Buffer.from(process.env.ENCRYPT_SECRET || "", "hex");
 if (secretToken.length !== 16) throw new Error("Missing ENCRYPT_SECRET environment variable - ensure it is 16 bytes in length");
 
-export function isKeyValid(platform: PlatformProps["name"], key: string): boolean {
+export function isKeyValid(platform: PlatformProps[ "name" ], key: string): boolean {
 	const steamRegex =
 		/^([A-Z0-9]{5}[A-Z0-9]{5}[A-Z0-9]{5}|[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}|[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}\-[A-Z0-9]{5}|[A-Z0-9]{5}[A-Z0-9]{5}[A-Z0-9]{5}[A-Z0-9]{5}[A-Z0-9]{5})$/i;
 	const eaRegex = /^([A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4}\-[A-Z0-9]{4})$/i;
@@ -49,16 +49,16 @@ export function parseClientPrismaError(error: unknown, tableName: string): { mes
 	const name = capitalizeString(tableName);
 	const errorObj = { name: "", message: "" };
 	if (error && typeof error == "object" && "code" in error && "name" in error && "message" in error) {
-		switch (error["code"]) {
+		switch (error[ "code" ]) {
 			case "P2002": {
 				errorObj.name = `Duplicate${name}RecordEntryError`;
 				errorObj.message = `${name} already exists in the database`;
-				throw { status: "fail", statusCode: 409, errors: { [tableName.toLowerCase()]: errorObj.message } } as ResponseProps;
+				throw { status: "fail", statusCode: 409, errors: { [ tableName.toLowerCase() ]: errorObj.message } } as ResponseProps;
 			}
 			case "P2025": {
 				errorObj.name = `Record${name}NotFoundError`;
 				errorObj.message = `Failed to find ${name} record`;
-				throw { status: "fail", statusCode: 404, errors: { [tableName.toLowerCase()]: errorObj.message } } as ResponseProps;
+				throw { status: "fail", statusCode: 404, errors: { [ tableName.toLowerCase() ]: errorObj.message } } as ResponseProps;
 			}
 			default:
 				break;
@@ -69,7 +69,7 @@ export function parseClientPrismaError(error: unknown, tableName: string): { mes
 export async function parseDiscordError(error: unknown, giveawayId?: number): Promise<ResponseProps | null> {
 	const obj: { message: string | null; name: string | null; code: number | null } = { message: null, name: null, code: null };
 	if (error && typeof error === "object" && "code" in error) {
-		switch (error["code"]) {
+		switch (error[ "code" ]) {
 			case 50007:
 				obj.code = 50007;
 				obj.name = "DiscordDirectMessagePrivacyError";
@@ -81,7 +81,7 @@ export async function parseDiscordError(error: unknown, giveawayId?: number): Pr
 				obj.name = "DiscordMissingPermissionsError";
 				obj.message = "Missing permissions - retry after permission changes";
 				if (giveawayId)
-				await GiveawayService.setGiveawayStatus(giveawayId, "failed", obj.message);
+					await GiveawayService.setGiveawayStatus(giveawayId, "failed", obj.message);
 				break;
 		}
 	}
@@ -97,7 +97,7 @@ export function capitalizeString(string: string) {
 export function encrypt(value: string) {
 	const iv = crypto.randomBytes(12);
 	const cipher = crypto.createCipheriv("aes-128-gcm", secretToken, iv, { authTagLength: 16 });
-	const encrypted = Buffer.concat([cipher.update(value), cipher.final()]);
+	const encrypted = Buffer.concat([ cipher.update(value), cipher.final() ]);
 	const authTag = cipher.getAuthTag();
 
 	return { encrypted, iv, authTag };
@@ -105,7 +105,7 @@ export function encrypt(value: string) {
 export function decrypt(encrypted: string, iv: string, authTag: string) {
 	const decipher = crypto.createDecipheriv("aes-128-gcm", secretToken, Buffer.from(iv, "hex"), { authTagLength: 16 });
 	decipher.setAuthTag(Buffer.from(authTag, "hex"));
-	const decrypted = Buffer.concat([decipher.update(Buffer.from(encrypted, "hex")), decipher.final()]);
+	const decrypted = Buffer.concat([ decipher.update(Buffer.from(encrypted, "hex")), decipher.final() ]);
 	return decrypted.toString("utf-8");
 }
 export function generateKeyHash(key: string) {
@@ -136,11 +136,14 @@ export function getDiscordVariables() {
 	const serverUrl = process.env.DISCORD_SERVER_URL;
 	const adminRoleId = process.env.DISCORD_ADMIN_ROLE_ID;
 	const giveawayLogChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_LOG_ID;
-
+	const giveawayEmoji = decodeURI(process.env.DISCORD_GIVEWAY_EMOJI_ID ?? "");
+	const giveawayDuration = process.env.DISCORD_GIVEAWAY_DURATION;
+	if (!giveawayEmoji) throw new Error('Missing DISCORD_GIVEAWAY_EMOJI_ID environment variable');
 	if (!guildId) throw new Error("Missing DISCORD_GUILD_ID environment variable");
 	if (!giveawayChannelId) throw new Error("Missing DISCORD_GIVEAWAY_CHANNEL_ID");
 	if (!token) throw new Error("Missing DISCORD_BOT_TOKEN environment variable");
 	if (!serverUrl) throw new Error("Missing DISCORD_SERVER_URL environment variable");
 	if (!adminRoleId) throw new Error("Missing DISCORD_ADMIN_ROLE_ID environment variable");
-	return { guildId, giveawayChannelId, token, serverUrl, adminRoleId, giveawayLogChannelId };
+	if (!giveawayDuration) throw new Error('Missing DISCORD_GIVEAWAY_DURATION environment variable');
+	return { guildId, giveawayChannelId, token, serverUrl, adminRoleId, giveawayLogChannelId, giveawayEmoji, giveawayDuration };
 }

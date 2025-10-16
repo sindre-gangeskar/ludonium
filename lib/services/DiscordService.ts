@@ -2,20 +2,22 @@ import axios from "axios";
 import { DiscordEmbedProps, ResponseProps } from "../definitions";
 import DonationService from "./DonationService";
 import GiveawayService from "./GiveawayService";
-
-import { capitalizeString, decrypt, getColorFromHexToInt, getDiscordVariables, parseClientPrismaError, parseDiscordError } from "../serverUtils";
+import { unstable_cache } from "next/cache";
+import { capitalizeString, decrypt, getColorFromHexToInt, getDiscordVariables, parseClientPrismaError, parseDiscordError } from "../utils/server";
 import KeyService from "./KeyService";
-
+const revalidate = process.env.REVALIDATE_AFTER ? +process.env.REVALIDATE_AFTER : 60 * 60 * 3;
 const { serverUrl } = getDiscordVariables();
 export default class DiscordService {
-	static async getGuildData() {
+	static getGulildData = unstable_cache(async () => {
 		try {
-			return await axios.get(`${serverUrl}/get-guild-info`, { headers: { "Content-Type": "application/json" } });
+			const { data: { data } } = await axios.get(`${serverUrl}/get-guild-info`, { headers: { "Content-Type": "application/json" } });
+			return data;
 		} catch (error) {
 			console.error(error);
 			throw { status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while fetching guild data" } } as ResponseProps;
 		}
-	}
+	}, [ 'guild-data' ], { revalidate: revalidate })
+
 	static async createGiveaway(donationId: number) {
 		try {
 			const donation = await DonationService.getById(donationId);
@@ -56,7 +58,7 @@ export default class DiscordService {
 					{ name: "Key", value: decrypted.toUpperCase() },
 				],
 			};
-			const body = { embeds: [embed] };
+			const body = { embeds: [ embed ] };
 
 			return await axios.post(`${serverUrl}/send-winner-dm/${discordId}`, body);
 		} catch (error) {

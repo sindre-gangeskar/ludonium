@@ -14,7 +14,7 @@ export default function Main() {
 		gsap.set("#title > *, .detail, #sub", { opacity: 0, y: -100 });
 		gsap.set("#title > *, .detail, #sub", { filter: "blur(16px)" });
 		gsap.to("#title > *, .detail, #sub", { filter: "blur(0px)", duration: 1.2, ease: "power4.out", stagger: 0.1 });
-		gsap.to("#title > *, .detail, #sub", { opacity: 1, duration: 1.7, delay: 0, ease: "back.out", stagger: 0.1, y: 0 });
+		gsap.to("#title > *, .detail, #sub", { opacity: 1, duration: 1.2, delay: 0, ease: "back.out", stagger: 0.1, y: 0 });
 	});
 
 	return (

@@ -1,6 +1,6 @@
 "use client";
 import { Box, useColorScheme } from "@mui/joy";
-import { applyGradientColors } from "@/lib/clientUtils";
+import { applyGradientColors } from "@/lib/utils/client";
 export default function Background() {
 	const { mode } = useColorScheme();
 	return (

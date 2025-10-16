@@ -1,14 +1,13 @@
 import { Client, GatewayIntentBits, Partials } from "discord.js";
 import GiveawayService from "./lib/services/GiveawayService";
 import ParticipantService from "./lib/services/ParticipantService";
-import { getDiscordVariables, isGiveawayExpired } from "./lib/serverUtils";
+import { getDiscordVariables } from "./lib/utils/server";
 
-const { token, giveawayChannelId } = getDiscordVariables();
-
+const { token, giveawayChannelId, giveawayEmoji } = getDiscordVariables();
 
 const client = new Client({
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessageReactions],
-	partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User],
+	intents: [ GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessageReactions ],
+	partials: [ Partials.Message, Partials.Channel, Partials.Reaction, Partials.User ],
 });
 
 client.on("ready", async () => {
@@ -19,14 +18,9 @@ client.login(token);
 
 client.on("messageReactionAdd", async (reaction, user) => {
 	try {
-		if (reaction && reaction.message.id && reaction.message.channelId === giveawayChannelId) {
-			const messageId = reaction.message.id;
-			const giveaway = await GiveawayService.getByMessageId(messageId);
-
-			if (giveaway && !isGiveawayExpired(giveaway.duration) && reaction.message.id === giveaway.messageId) {
-				await ParticipantService.create(giveaway.id, user.id);
-			} else reaction.remove();
-		}
+		if (reaction && reaction.message.id && reaction.message.channelId === giveawayChannelId && reaction.emoji.name === giveawayEmoji.toString()) {
+			await GiveawayService.addParticipant(reaction.message.id, user, reaction);
+		} else reaction.users.remove(user.id);
 	} catch (error) {
 		console.error(error);
 		return null;
@@ -34,23 +28,12 @@ client.on("messageReactionAdd", async (reaction, user) => {
 });
 client.on("messageReactionRemove", async (reaction, user) => {
 	try {
-		if (reaction && reaction.message.id && reaction.message.channelId === giveawayChannelId) {
-			const giveaway = await GiveawayService.getByMessageId(reaction.message.id);
+		const giveaway = await GiveawayService.getByMessageId(reaction.message.id);
+		if (!giveaway) return;
 
-			if (giveaway && reaction.message.id === giveaway.messageId) {
-				await ParticipantService.delete(giveaway.id, user.id);
-				const message = reaction.message;
-
-				for (const [, reaction] of message.reactions.cache) {
-					const reacted = await reaction.users.fetch().then(users => users.has(user.id));
-					
-					if (reacted) {
-						/* Delay removal action to help soften bot action rate-limiting */
-						await new Promise(resolve => setTimeout(resolve, 1000));
-						await reaction.users.remove(user.id);
-					}
-				}
-			}
+		if (reaction.message.id === giveaway.messageId) {
+			await ParticipantService.delete(giveaway.id, user.id);
+			await reaction.users.remove(user.id);
 		}
 	} catch (error) {
 		console.error(error);
@@ -68,5 +51,4 @@ async function checkGiveawaysInterval(intervalInMinutes: number = 5) {
 		pending = false;
 	}, timeInMinutes);
 }
-
 export default client;

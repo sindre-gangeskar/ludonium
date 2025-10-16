@@ -1,6 +1,6 @@
 import { DonationProps, PlatformProps, PlatformTypeProps, ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { isKeyValid, parseClientPrismaError } from "../serverUtils";
+import { isKeyValid, parseClientPrismaError } from "../utils/server";
 import DiscordService from "./DiscordService";
 import KeyService from "./KeyService";
 
@@ -15,7 +15,7 @@ export default class DonationService {
 			})) as DonationProps[];
 		} catch (error) {
 			console.error(error);
-			return { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to get donations" } as ResponseProps;
+			throw { status: "error", statusCode: 500, message: "An internal server error has occurred while trying to get donations" } as ResponseProps;
 		}
 	}
 	static async create(formdata: FormData) {

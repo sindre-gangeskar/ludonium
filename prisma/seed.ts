@@ -46,8 +46,7 @@ async function seed() {
 	}
 }
 
-seed()
-	.then(async () => {
+seed().then(async () => {
 		prisma.$disconnect();
 	})
 	.catch(err => {

@@ -1,6 +1,6 @@
 import { ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { isGiveawayExpired, parseClientPrismaError } from "../serverUtils";
+import { isGiveawayExpired, parseClientPrismaError } from "../utils/server";
 import GiveawayService from "./GiveawayService";
 
 export default class ParticipantService {

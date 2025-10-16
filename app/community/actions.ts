@@ -1,16 +1,12 @@
 "use server";
-import DiscordBotService from "@/lib/services/DiscordService";
 import { redirect } from "next/navigation";
+import DiscordService from "@/lib/services/DiscordService";
 
 export async function getDiscordServerInfo() {
-	return await fetch("/api/discord");
+	return await DiscordService.getGulildData();
 }
 
 export async function redirectToInviteLink() {
 	const inviteLink = process.env.DISCORD_INVITE_URL;
 	if (inviteLink) return redirect(inviteLink);
-}
-
-export async function pingDiscordChannel() {
-  await DiscordBotService.test();
 }

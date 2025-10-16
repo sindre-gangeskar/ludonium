@@ -1,6 +1,6 @@
 import { ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { encrypt, generateKeyHash, parseClientPrismaError } from "../serverUtils";
+import { encrypt, generateKeyHash, parseClientPrismaError } from "../utils/server";
 export default class KeyService {
 	static async create(key: string, platformId: number) {
 		try {

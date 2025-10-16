@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
 	const theme = useTheme();
 	const customTheme = extendTheme({
-		fontFamily: { body: "var(--font-funnel-sans)" },
+		fontFamily: { body: "var(--font-roboto)" },
 		typography: {
-			h1: { fontFamily: "var(--font-rem)" },
-			h2: { fontFamily: "var(--font-rem)", fontWeight: 900 },
-			h3: { fontFamily: "var(--font-rem)", fontWeight: 900 },
-			h4: { fontFamily: "var(--font-rem)", fontWeight: 900 },
+			h1: { fontWeight: 700, fontFamily: 'var(--font-roboto)' },
+			h2: { fontWeight: 700, fontFamily: 'var(--font-roboto)' },
+			h3: { fontWeight: 700, fontFamily: 'var(--font-roboto)' },
+			h4: { fontWeight: 700, fontFamily: 'var(--font-roboto)' },
 		},
 		colorSchemes: {
 			dark: {

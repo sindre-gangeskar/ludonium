@@ -3,9 +3,8 @@ dotenv.config();
 import express from "express";
 import client from "./bot";
 import { DiscordEmbedProps, DiscordMessageProps, ResponseProps } from "./lib/definitions";
-import { capitalizeString, getColorFromHexToInt, getDiscordVariables, getGiveawayDurationInLocaleString } from "./lib/serverUtils";
+import { capitalizeString, getColorFromHexToInt, getDiscordVariables, getGiveawayDurationInLocaleString } from "./lib/utils/server";
 
-import GiveawayService from "./lib/services/GiveawayService";
 const { guildId, adminRoleId, giveawayChannelId } = getDiscordVariables();
 
 const app = express();
@@ -22,7 +21,7 @@ app.post("/create-giveaway", async (req, res, next) => {
 
 		if (channel && channel.isTextBased() && channel.isSendable()) {
 			const embed: DiscordEmbedProps = {
-				color: getColorFromHexToInt("#fdf690"),
+				color: getColorFromHexToInt("#9500ff"),
 				thumbnail: { url: preview.iconURL() ?? "" },
 				title: "Community Game Key Giveaway",
 				description: "A game key giveaway has started for a donated game!\nMake sure to react to this message to participate in the giveaway!",
@@ -39,18 +38,20 @@ app.post("/create-giveaway", async (req, res, next) => {
 				],
 				footer: { text: "NOTE: Adding multiple reactions will NOT increase your chances at winning." },
 			};
-			const body: DiscordMessageProps = { embeds: [embed] };
+			const body: DiscordMessageProps = { embeds: [ embed ] };
+			const emoji = "👍";
 			const message = await channel.send(body);
-			await GiveawayService.updateById(giveaway.id, message.id);
-			return res.json({ message: "Successfully sent giveaway from bot service", statusCode: 200 });
+			if (message)
+				await message.react(emoji);
+			return res.status(200).json({ message: "Successfully sent giveaway from bot service", statusCode: 200 });
 		}
 	} catch (error) {
-		if (error && typeof error === "object" && "code" in error) {
-			console.warn("The bot is missing the required permissions to send a message in the channel. Ensure it has the rights to send messages.");
+		if (error && typeof error === "object" && "code" in error && "message" in error) {
+			console.error(error.message);
 		} else {
 			console.error(error);
 		}
-		next();
+		next(error);
 	}
 });
 app.post("/send-winner-dm/:discordId", async (req, res, next) => {
@@ -105,5 +106,5 @@ app.get("/validate-guild-membership/:discordId", async (req, res) => {
 	}
 });
 app.listen(process.env.SERVER_PORT || 3001, () => {
-	console.log("Express server listening on 3001");
+	console.info(`Express server listening on ${process.env.SERVER_PORT || 3001}`);
 });

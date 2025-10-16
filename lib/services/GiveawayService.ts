@@ -1,18 +1,17 @@
-import { PlatformTypeProps, ResponseProps, StatusProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { getGiveawayDurationInDateTime, parseClientPrismaError } from "../serverUtils";
 import DiscordService from "./DiscordService";
 import DonationService from "./DonationService";
-
-const customGiveawayDuration = process.env.DISCORD_GIVEAWAY_DURATION;
-
-
-
+import { MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js";
+import { PlatformTypeProps, ResponseProps, StatusProps } from "../definitions";
+import { getGiveawayDurationInDateTime, parseClientPrismaError } from "../utils/server";
+import { getDiscordVariables } from "../utils/server";
+import { isGiveawayExpired } from "../utils/server";
+const { giveawayDuration } = getDiscordVariables();
 export default class GiveawayService {
 	static async create(donationId: number) {
 		try {
 			const status = await prisma.status.findFirstOrThrow({ where: { name: "active" } });
-			const duration = getGiveawayDurationInDateTime(customGiveawayDuration ? +customGiveawayDuration : 2);
+			const duration = getGiveawayDurationInDateTime(+giveawayDuration || 2);
 			const giveaway = await prisma.giveaway.create({ data: { statusId: status.id, duration: duration } });
 			await DonationService.assignGiveawayId(donationId, giveaway.id);
 			return giveaway;
@@ -69,18 +68,18 @@ export default class GiveawayService {
 			throw prismaError ?? ({ status: "error", statusCode: 500, errors: { generic: "An internal server error has occurred while trying to update giveaway" } } as ResponseProps);
 		}
 	}
-	static async createRandomGiveaway(platformType: PlatformTypeProps["name"]) {
+	static async createRandomGiveaway(platformType: PlatformTypeProps[ "name" ]) {
 		try {
 			const donations = await DonationService.getByPlatformType(platformType);
 			if (donations.length > 0) {
 				const randomSelection = Math.floor(Math.random() * donations.length);
-				await DiscordService.createGiveaway(donations[randomSelection].id);
+				await DiscordService.createGiveaway(donations[ randomSelection ].id);
 				return { status: "success", statusCode: 200, message: "Successfully created giveaway" } as ResponseProps;
 			} else
 				throw {
 					status: "fail",
 					statusCode: 404,
-					errors: { [platformType]: `Could not create ${platformType} giveaway - no available donations found` },
+					errors: { [ platformType ]: `Could not create ${platformType} giveaway - no available donations found` },
 				} as ResponseProps;
 		} catch (error) {
 			console.error(error);
@@ -93,8 +92,8 @@ export default class GiveawayService {
 					status: "error",
 					statusCode: 500,
 					errors: {
-						[platformType]: `An internal server error has occurred while trying to create random ${platformType} giveaway`,
-						errors: { [platformType]: "An internal server error has occurred while trying to create a random giveaway" },
+						[ platformType ]: `An internal server error has occurred while trying to create random ${platformType} giveaway`,
+						errors: { [ platformType ]: "An internal server error has occurred while trying to create a random giveaway" },
 					},
 				} as ResponseProps)
 			);
@@ -110,7 +109,7 @@ export default class GiveawayService {
 
 				const offset = Math.floor(Math.random() * pCount);
 
-				const [winner] = await tx.participant.findMany({ where: { giveawayId }, orderBy: { id: "asc" }, skip: offset, take: 1 });
+				const [ winner ] = await tx.participant.findMany({ where: { giveawayId }, orderBy: { id: "asc" }, skip: offset, take: 1 });
 				if (!winner) return null;
 
 				const updated = await tx.giveaway.update({ data: { winnerDiscordId: winner.discordId }, where: { id: giveawayId, winnerDiscordId: null } });
@@ -152,7 +151,7 @@ export default class GiveawayService {
 			throw prismaError ?? ({ status: "error", statusCode: 500, message: "An internal server error has occurred while trying to check giveaways" } as ResponseProps);
 		}
 	}
-	static async setGiveawayStatus(id: number, statusName: StatusProps["name"], giveawayLog: string) {
+	static async setGiveawayStatus(id: number, statusName: StatusProps[ "name" ], giveawayLog: string) {
 		try {
 			return await prisma.$transaction(async tx => {
 				const giveaway = await tx.giveaway.findUniqueOrThrow({ where: { id: id } });
@@ -164,6 +163,25 @@ export default class GiveawayService {
 			console.error(error);
 			const prismaError = parseClientPrismaError(error, "giveaways");
 			throw prismaError ?? ({ status: "error", statusCode: 500, message: "An internal server error has occurred while trying to assign giveaway a status" } as ResponseProps);
+		}
+	}
+	static async addParticipant(discordMessageId: string, user: User | PartialUser, reaction: MessageReaction | PartialMessageReaction) {
+		try {
+			const giveaway = await GiveawayService.getByMessageId(discordMessageId);
+			if (!giveaway || (giveaway && isGiveawayExpired(giveaway.duration))) {
+				reaction.users.remove(user.id);
+				return;
+			}
+
+			return await prisma.$transaction(async tx => {
+				const giveaway = await tx.giveaway.findFirstOrThrow({ where: { messageId: discordMessageId } });
+				const participant = await tx.participant.create({ data: { giveawayId: giveaway.id, discordId: user.id } })
+				return { giveaway, participant };
+			})
+		} catch (error) {
+			const prismaError = parseClientPrismaError(error, 'Giveaway | Participant');
+			console.error(prismaError ?? error);
+			throw prismaError ?? { status: "error", statusCode: 500, message: 'An internal server error has occured while trying to add a participant' } as ResponseProps
 		}
 	}
 }

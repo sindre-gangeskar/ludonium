@@ -23,8 +23,8 @@ export interface PlatformTypeProps {
 export interface DonationProps {
 	region: RegionProps;
 	discordId?: string;
-	platformType: PlatformTypeProps["name"];
-	platform: PlatformProps["name"];
+	platformType: PlatformTypeProps[ "name" ];
+	platform: PlatformProps[ "name" ];
 }
 
 export interface KeyProps {
@@ -59,11 +59,11 @@ export interface GiveawayCountProps {
 }
 
 export interface DonationFormErrorProps {
-	[key: string]: string;
+	[ key: string ]: string;
 }
 
 export interface GenericErrorProps {
-	[key: string]: string;
+	[ key: string ]: string;
 }
 
 export interface ResponseProps<T = unknown> {
@@ -74,6 +74,9 @@ export interface ResponseProps<T = unknown> {
 	data?: T;
 }
 
+export interface DiscordGuildProps {
+	data: { name: string; iconURL: string; description: string }
+}
 export interface DiscordEmbedProps {
 	title: string;
 	description?: string;

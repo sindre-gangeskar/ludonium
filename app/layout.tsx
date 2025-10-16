@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, REM, Funnel_Sans } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/theme/ThemeProvider";
 import { Container } from "@mui/joy";
@@ -7,28 +7,13 @@ import Navbar from "@/components/ui/Navbar";
 import { SessionProvider } from "next-auth/react";
 import Background from "@/components/ui/Background";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
-});
-
-const funnelSans = Funnel_Sans({
-	variable: "--font-funnel-sans",
-	subsets: ["latin"],
-});
-
-const rem = REM({
-	variable: "--font-rem",
+const roboto = Roboto({
+	variable: "--font-roboto",
 	subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-	title: "Ludonium",
+	title: { default: "Ludonium", template: "Ludonium | %s" },
 	description: "A giveaway system utilizing donated game keys for giving back to the community",
 };
 
@@ -43,7 +28,7 @@ export default function RootLayout({
 				<noscript>JavaScript must be enabled in order to use this website.</noscript>
 				<link rel="icon" type="image/svg+xml" href="/icon.svg"></link>
 			</head>
-			<body className={`${geistSans.variable} ${geistMono.variable} ${rem.variable} ${funnelSans.variable} antialiased`}>
+			<body className={`${roboto.variable} antialiased`}>
 				<SessionProvider>
 					<ThemeProvider>
 						<Navbar />

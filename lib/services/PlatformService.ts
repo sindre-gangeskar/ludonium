@@ -1,6 +1,6 @@
 import { ResponseProps } from "../definitions";
 import prisma from "../prisma/prisma";
-import { parseClientPrismaError } from "../serverUtils";
+import { parseClientPrismaError } from "../utils/server";
 export default class PlatformService {
 	static async getAll() {
 		try {
