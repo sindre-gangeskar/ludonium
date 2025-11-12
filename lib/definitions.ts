@@ -1,3 +1,4 @@
+
 export interface PlatformProps {
 	id?: number;
 	name: string | "steam" | "ea" | "gog" | "epic" | "ubisoft" | "switch" | "playstation" | "xbox";

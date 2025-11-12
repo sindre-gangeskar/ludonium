@@ -4,21 +4,25 @@ import { GuildProps } from "./lib/definitions";
 import axios from "axios";
 declare module "next-auth" {
 	interface Session {
+		user: { id: string }
 		isMemberOfGuild: boolean;
 		name: string;
-		userId: string;
 		icon: string;
 		guild: { id: string; name: string; icon?: string };
 		role?: string;
 		isAdmin?: boolean;
 	}
 }
-export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
+export const { handlers, signIn, signOut, auth } = NextAuth({
+	secret: process.env.AUTH_SECRET,
 	providers: [
 		Discord({
+			clientId: process.env.AUTH_DISCORD_ID!,
+			clientSecret: process.env.AUTH_DISCORD_SECRET!,
 			authorization: { params: { scope: "identify guilds" } },
 		}),
 	],
+	session: {strategy: 'jwt'},
 	callbacks: {
 		async jwt({ token, account }) {
 			/* Initial login */
@@ -43,9 +47,8 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
 
 			return token;
 		},
-
 		async session({ session, token }) {
-			if (token.userId) session.user.id = String(token.userId);
+			if (token.userId && session.user) session.user.id = String(token.userId);
 
 			session.isAdmin = Boolean(token.isAdmin);
 			session.isMemberOfGuild = Boolean(token.isMemberOfGuild);

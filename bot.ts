@@ -14,7 +14,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 
 		if (reaction.message.channelId === giveawayChannelId && isRequiredEmoji(reaction))
 			await GiveawayService.addParticipant(reaction.message.id, user, reaction);
-		else reaction.users.remove(user.id);
+		else await reaction.users.remove(user.id);
 	} catch (error) {
 		console.error(error);
 		return null;

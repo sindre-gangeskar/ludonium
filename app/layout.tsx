@@ -4,8 +4,8 @@ import "./globals.css";
 import ThemeProvider from "@/components/theme/ThemeProvider";
 import { Container } from "@mui/joy";
 import Navbar from "@/components/ui/Navbar";
-import { SessionProvider } from "next-auth/react";
 import Background from "@/components/ui/Background";
+import ClientSessionProvider from "@/components/ui/ClientSessionProvider";
 
 const roboto = Roboto({
 	variable: "--font-roboto",
@@ -29,13 +29,13 @@ export default function RootLayout({
 				<link rel="icon" type="image/svg+xml" href="/icon.svg"></link>
 			</head>
 			<body className={`${roboto.variable} antialiased`}>
-				<SessionProvider>
+				<ClientSessionProvider>
 					<ThemeProvider>
 						<Navbar />
 						<Container maxWidth={"xl"}>{children}</Container>
 						<Background />
 					</ThemeProvider>
-				</SessionProvider>
+				</ClientSessionProvider>
 			</body>
 		</html>
 	);

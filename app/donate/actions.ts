@@ -28,10 +28,12 @@ export async function submitDonation(_state: ResponseProps | null, formdata: For
 		const discordId = String(formdata.get("discordId"));
 		if (!discordId) return { status: "fail", statusCode: 400, message: "Failed to retrieve discord id" } as ResponseProps;
 		const response = await DiscordService.validateDiscordGuildMembership(discordId);
+		console.log(response);
 		if (response && response.data.status === "success") {
 			await DonationService.create(formdata);
 			return { status: "success", statusCode: 201, message: "Successfully created donation" } as ResponseProps;
 		} else return response.data;
+
 	} catch (error) {
 		return error as ResponseProps;
 	}

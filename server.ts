@@ -92,10 +92,9 @@ app.get("/verify-admin-role/:discordId", async (req, res) => {
 app.get("/validate-guild-membership/:discordId", async (req, res) => {
 	try {
 		const discordId = req.params.discordId;
-		const guild = await client.guilds.fetch(guildId);
-		const membersList = await guild.members.fetch();
-		const isMember = membersList?.some(user => user.id === discordId);
-		if (!isMember)
+		const guild = await client.guilds.fetch({guild: guildId, force: true});
+		const member = await guild.members.fetch({user: discordId, force: true});
+		if (!member)
 			return res
 				.status(404)
 				.json({ status: "fail", statusCode: 404, message: "Discord user could not be found in the guild", errors: { discordMembership: "You are currently not a member of the guild." } } as ResponseProps);
