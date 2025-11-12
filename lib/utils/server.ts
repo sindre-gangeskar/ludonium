@@ -1,6 +1,8 @@
-import { PlatformProps, ResponseProps } from "../definitions";
+import { PlatformProps, ResponseProps, DiscordEmbedProps } from "../definitions";
 import crypto from "crypto";
 import GiveawayService from "../services/GiveawayService";
+import { Channel, User } from "discord.js";
+import { Request } from "express";
 
 const secretToken = Buffer.from(process.env.ENCRYPT_SECRET || "", "hex");
 if (secretToken.length !== 16) throw new Error("Missing ENCRYPT_SECRET environment variable - ensure it is 16 bytes in length");
@@ -87,7 +89,7 @@ export async function parseDiscordError(error: unknown, giveawayId?: number): Pr
 	}
 
 	if (!obj.code) return null;
-	throw { status: "fail", statusCode: 403, message: obj.message } as ResponseProps;
+	return { status: "fail", statusCode: 403, message: obj.message } as ResponseProps;
 }
 export function capitalizeString(string: string) {
 	const capitalized = string.slice(0, 1).toUpperCase();
@@ -135,7 +137,7 @@ export function getDiscordVariables() {
 	const token = process.env.DISCORD_BOT_TOKEN;
 	const serverUrl = process.env.DISCORD_SERVER_URL;
 	const adminRoleId = process.env.DISCORD_ADMIN_ROLE_ID;
-	const giveawayLogChannelId = process.env.DISCORD_GIVEAWAY_CHANNEL_LOG_ID;
+	const giveawayLogChannelId = process.env.DISCORD_GIVEAWAY_LOG_CHANNEL_ID;
 	const giveawayEmoji = decodeURI(process.env.DISCORD_GIVEAWAY_EMOJI ?? "");
 	const giveawayDuration = process.env.DISCORD_GIVEAWAY_DURATION;
 	if (!giveawayEmoji) throw new Error('Missing DISCORD_GIVEAWAY_EMOJI environment variable');
@@ -145,5 +147,43 @@ export function getDiscordVariables() {
 	if (!serverUrl) throw new Error("Missing DISCORD_SERVER_URL environment variable");
 	if (!adminRoleId) throw new Error("Missing DISCORD_ADMIN_ROLE_ID environment variable");
 	if (!giveawayDuration) throw new Error('Missing DISCORD_GIVEAWAY_DURATION environment variable');
+	if (!giveawayLogChannelId) throw new Error('Missing DISCORD_GIVEAWAY_LOG_CHANNEL_ID environment variable');
 	return { guildId, giveawayChannelId, token, serverUrl, adminRoleId, giveawayLogChannelId, giveawayEmoji, giveawayDuration };
+}
+export async function processDiscordGiveawayWinnerDM(discordUser: User, giveawayHistoryChannel: Channel | null, body: Request[ "body" ]) {
+	try {
+		const dmChannel = await discordUser.createDM(true);
+		/* Send DM to winner */
+		await dmChannel.send({ embeds: body.embeds });
+		if (!dmChannel.isSendable()) {
+			console.info('Cannot send message - lacking permissions...');
+			return;
+		}
+		/* Send message to winner history channel for logging purposes */
+		if (giveawayHistoryChannel?.isSendable()) {
+			const embed: DiscordEmbedProps = {
+				title: 'Successfully sent winner DM with prize',
+				thumbnail: { url: discordUser.avatarURL() ?? "" },
+				description: `Successfully sent direct message to winner: **${discordUser.displayName}**`,
+				color: getColorFromHexToInt("#4fff24"),
+				fields: [ { name: "**Giveaway ID**", value: `${body.giveawayId ?? "N/A"}` }, { name: "**Winner Discord ID**", value: discordUser.id } ]
+			}
+			await giveawayHistoryChannel.send({ embeds: [ embed ] })
+		}
+
+	} catch (error) {
+		console.error(error);
+		if (error && typeof error === "object" && "code" in error && error.code === 50007) {
+			const embed: DiscordEmbedProps = {
+				title: `Failed to send direct message to **${discordUser.displayName}**`,
+				description: `Failed to send direct message to the winner of a giveaway - please ensure that **${discordUser.displayName}** has direct messages enabled in the **social settings**`,
+				thumbnail: { url: discordUser.avatarURL()! },
+				color: getColorFromHexToInt("#e63636"),
+				fields: [ { name: "**Giveaway ID**", value: body.giveawayId }, { name: "**Discord Winner ID**", value: discordUser.id } ],
+			}
+			if (giveawayHistoryChannel?.isSendable()) {
+				await giveawayHistoryChannel.send({ embeds: [ embed ], components: [ { type: 1, components: [ { type: 2, style: 1, label: "Resend DM", custom_id: `resend_giveaway_dm:${discordUser.id}:${body.giveawayId}` } ] } ] });
+			}
+		}
+	}
 }

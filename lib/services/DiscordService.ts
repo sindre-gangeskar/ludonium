@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { DiscordEmbedProps, ResponseProps } from "../definitions";
 import DonationService from "./DonationService";
 import GiveawayService from "./GiveawayService";
@@ -48,6 +48,7 @@ export default class DiscordService {
 		try {
 			const key = await KeyService.getById(keyId);
 			const decrypted = decrypt(key.key, key.iv, key.authTag);
+
 			const embed: DiscordEmbedProps = {
 				title: "Congratulations!",
 				description: "You've won a donated game key giveaway!",
@@ -58,13 +59,17 @@ export default class DiscordService {
 					{ name: "Key", value: decrypted.toUpperCase() },
 				],
 			};
-			const body = { embeds: [ embed ] };
+			const body = { embeds: [ embed ], giveawayId };
 
 			return await axios.post(`${serverUrl}/send-winner-dm/${discordId}`, body);
 		} catch (error) {
-			console.error(error);
-			const discordError = await parseDiscordError(error, giveawayId);
-			throw discordError ?? ({ status: "error", statusCode: 500, message: "An internal server error has occurred while trying to send giveaway winner dm" } as ResponseProps);
+			if (error instanceof AxiosError) {
+				console.error(error.message);
+			} else {
+				const discordError = await parseDiscordError(error, giveawayId);
+				console.error(discordError ?? error);
+				throw discordError ?? ({ status: "error", statusCode: 500, message: "An internal server error has occurred while trying to send giveaway winner dm" } as ResponseProps);
+			}
 		}
 	}
 }

@@ -79,7 +79,7 @@ export interface DiscordGuildProps {
 	data: { name: string; iconURL: string; description: string }
 }
 export interface DiscordEmbedProps {
-	title: string;
+	title?: string;
 	description?: string;
 	color?: number;
 	thumbnail?: DiscordMediaProps;
@@ -111,6 +111,17 @@ export interface DiscordMediaProps {
 	height?: number;
 	width?: number;
 	proxy_url?: string;
+}
+
+export interface DiscordGiveawayErrorProps {
+	name: string;
+	title: string;
+	userId: string;
+	displayName: string;
+	giveawayId: string;
+	thumbnail?: { url?: string };
+	fields?: DiscordEmbedProps[ "fields" ];
+	color?: string;
 }
 
 export type PlatformTypes = "pc" | "console";

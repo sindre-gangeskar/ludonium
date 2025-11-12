@@ -1,12 +1,13 @@
 import dotenv from 'dotenv';
 dotenv.config();
-import express from "express";
+import express, { Request, Response } from "express";
 import client from "./bot";
+
 import { DiscordEmbedProps, DiscordMessageProps, ResponseProps } from "./lib/definitions";
-import { capitalizeString, getColorFromHexToInt, getDiscordVariables, getGiveawayDurationInLocaleString } from "./lib/utils/server";
+import { capitalizeString, getColorFromHexToInt, getDiscordVariables, getGiveawayDurationInLocaleString, processDiscordGiveawayWinnerDM } from "./lib/utils/server";
 import GiveawayService from './lib/services/GiveawayService';
 
-const { guildId, adminRoleId, giveawayChannelId, giveawayEmoji } = getDiscordVariables();
+const { guildId, adminRoleId, giveawayChannelId, giveawayEmoji, giveawayLogChannelId } = getDiscordVariables();
 const app = express();
 
 app.use(express.json());
@@ -54,22 +55,21 @@ app.post("/create-giveaway", async (req, res, next) => {
 		next();
 	}
 });
-app.post("/send-winner-dm/:discordId", async (req, res, next) => {
+app.post("/send-winner-dm/:discordId", async (req: Request, res: Response) => {
 	try {
 		const { body } = req;
 		const discordId = req.params.discordId;
-
+		const giveawayHistoryChannel = await client.channels.fetch(giveawayLogChannelId);
 		const discordUser = await client.users.fetch(discordId, { force: true });
+
 		if (!discordId || !discordUser) throw new Error("Unable to find Discord User with provided id");
 
-		const dmChannel = await discordUser.createDM(true);
-		if (!dmChannel || !dmChannel.isSendable()) throw new Error("Failed to establish dm channel connection with discord user");
+		await processDiscordGiveawayWinnerDM(discordUser, giveawayHistoryChannel, body);
 
-		await dmChannel.send({ embeds: body.embeds });
 		return res.json({ status: "success", statusCode: 200, message: "Successfully sent dm to winner" } as ResponseProps);
 	} catch (error) {
 		console.error(error);
-		next();
+		return res.status(500).json({ message: "Failed to send DM to winner" });
 	}
 });
 app.get("/get-guild-info", async (req, res) => {
@@ -92,8 +92,8 @@ app.get("/verify-admin-role/:discordId", async (req, res) => {
 app.get("/validate-guild-membership/:discordId", async (req, res) => {
 	try {
 		const discordId = req.params.discordId;
-		const guild = await client.guilds.fetch({guild: guildId, force: true});
-		const member = await guild.members.fetch({user: discordId, force: true});
+		const guild = await client.guilds.fetch({ guild: guildId, force: true });
+		const member = await guild.members.fetch({ user: discordId, force: true });
 		if (!member)
 			return res
 				.status(404)

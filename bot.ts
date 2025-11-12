@@ -49,9 +49,9 @@ function initializeClient() {
 		partials: [ Partials.Message, Partials.Channel, Partials.Reaction, Partials.User ],
 	});
 
-	client.on("ready", async () => {
+	client.on("clientReady", async () => {
 		console.log("Discord Bot is ready");
-		await checkGiveawaysInterval(10);
+		await checkGiveawaysInterval(0.5);
 	});
 
 	client.login(token);
