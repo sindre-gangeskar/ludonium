@@ -1,7 +1,7 @@
-import { PrismaClient } from '@/.prisma/client';
+import { PrismaClient } from "@/.prisma/client";
 const singleton = global as unknown as { prisma?: PrismaClient };
-const prisma = singleton.prisma ?? new PrismaClient({ log: [ 'query' ] });
+const prisma = singleton.prisma ?? new PrismaClient({ log: ["query"] });
 
-if (process.env.NODE_ENV === "development") singleton.prisma = prisma;
+!singleton.prisma ? (singleton.prisma = prisma) : singleton.prisma;
 
 export default prisma;

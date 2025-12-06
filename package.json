@@ -2,15 +2,11 @@
   "name": "ludonium",
   "version": "0.1.0",
   "private": true,
-  "prisma": {
-    "seed": "bun prisma/seed.ts"
-  },
   "scripts": {
     "dev": "concurrently \"next dev --turbopack \"  \"bun server.ts\"",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "bunx prisma generate"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -21,13 +17,14 @@
     "@prisma/client": "^6.19.0",
     "@types/express": "^5.0.5",
     "axios": "^1.13.2",
+    "baseline-browser-mapping": "^2.9.4",
     "discord.js": "^14.24.2",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "gsap": "^3.13.0",
-    "next": "16.0.1",
+    "next": "16.0.7",
     "next-auth": "^5.0.0-beta.30",
-    "prisma": "^6.19.0",
+    "prisma": "^7.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "swr": "^2.3.6",
